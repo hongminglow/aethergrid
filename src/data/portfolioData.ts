@@ -49,8 +49,15 @@ export const portfolioData = {
     "CSS",
     "PostgreSQL",
     "REST APIs",
+    "GraphQL",
+    "Prisma",
+    "Tailwind CSS",
+    "Testing",
+    "CI/CD",
+    "Performance",
     "Git",
-    "UI Engineering"
+    "UI Engineering",
+    "Product Thinking"
   ]
 } as const;
 

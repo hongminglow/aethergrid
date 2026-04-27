@@ -75,4 +75,4 @@ That file should control:
 
 ## Current Status
 
-Batch 1 is complete. The repository now contains the Vite + TypeScript scaffold, core dependencies, starter source structure, editable portfolio data file, and planning documents.
+Batch 2 is complete. The repository now contains the Vite + TypeScript scaffold, core dependencies, starter source structure, editable portfolio data file, and data-driven DOM sections for identity, experience, skills, and contact.

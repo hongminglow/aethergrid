@@ -18,15 +18,15 @@ Use this checklist to track implementation by batch. Each batch should be comple
 
 ## Batch 2 - Data-Driven Portfolio Content
 
-- [ ] Render name from `portfolioData`.
-- [ ] Render title from `portfolioData`.
-- [ ] Render three to four intro lines from `portfolioData`.
-- [ ] Render total years and experience summary from `portfolioData`.
-- [ ] Render all job experience entries from `portfolioData`.
-- [ ] Render all experience bullet descriptions from `portfolioData`.
-- [ ] Render 10 to 20+ skills from `portfolioData`.
-- [ ] Render email, GitHub, and LinkedIn from `portfolioData`.
-- [ ] Ensure no portfolio content is hardcoded inside render or animation modules.
+- [x] Render name from `portfolioData`.
+- [x] Render title from `portfolioData`.
+- [x] Render three to four intro lines from `portfolioData`.
+- [x] Render total years and experience summary from `portfolioData`.
+- [x] Render all job experience entries from `portfolioData`.
+- [x] Render all experience bullet descriptions from `portfolioData`.
+- [x] Render 10 to 20+ skills from `portfolioData`.
+- [x] Render email, GitHub, and LinkedIn from `portfolioData`.
+- [x] Ensure no portfolio content is hardcoded inside render or animation modules.
 
 ## Batch 3 - Three.js Visual Foundation
 
