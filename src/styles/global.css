@@ -2,6 +2,7 @@
   --intro-progress: 0;
   --experience-progress: 0;
   --skills-progress: 0;
+  --contact-progress: 0;
   color: #f5fbff;
   background: #05070d;
   font-family:
@@ -514,10 +515,66 @@ h3 {
 }
 
 .contact-links--final {
-  margin-top: 30px;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 }
 
-.contact-links a {
+.contact-section {
+  width: min(980px, 100%);
+  min-height: 84vh;
+  display: grid;
+  align-content: center;
+}
+
+.contact-stage {
+  position: relative;
+  padding: clamp(24px, 5vw, 58px);
+  overflow: hidden;
+  border: 1px solid rgb(130 255 114 / 24%);
+  background:
+    radial-gradient(circle at 18% 20%, rgb(130 255 114 / 14%), transparent 30%),
+    radial-gradient(circle at 78% 34%, rgb(255 72 196 / 12%), transparent 28%),
+    linear-gradient(135deg, rgb(5 7 13 / 58%), rgb(12 17 31 / 62%));
+  box-shadow:
+    inset 0 0 76px rgb(130 255 114 / 6%),
+    0 32px 100px rgb(0 0 0 / 34%);
+}
+
+.contact-stage__beam {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: min(740px, 90vw);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #82ff72, #70f6ff, #ff48c4, transparent);
+  box-shadow:
+    0 0 42px rgb(130 255 114 / 30%),
+    0 0 72px rgb(112 246 255 / 22%);
+  opacity: calc(0.22 + var(--contact-progress) * 0.52);
+  transform: translate(-50%, -50%) rotate(calc(-8deg + var(--contact-progress) * 18deg));
+  pointer-events: none;
+}
+
+.contact-stage__node {
+  position: absolute;
+  right: clamp(22px, 5vw, 60px);
+  top: clamp(22px, 5vw, 60px);
+  width: clamp(58px, 8vw, 96px);
+  aspect-ratio: 1;
+  border: 1px solid rgb(112 246 255 / 28%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgb(112 246 255 / 22%), transparent 60%),
+    radial-gradient(circle at 72% 32%, rgb(130 255 114 / 20%), transparent 36%);
+  box-shadow: 0 0 44px rgb(112 246 255 / 16%);
+  opacity: calc(0.38 + var(--contact-progress) * 0.42);
+  transform: scale(calc(0.86 + var(--contact-progress) * 0.18));
+  pointer-events: none;
+}
+
+.contact-link {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
@@ -527,9 +584,64 @@ h3 {
   background: rgb(5 7 13 / 42%);
   color: #f5fbff;
   text-decoration: none;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
 }
 
-.contact-links a:focus-visible {
+.contact-link span {
+  color: #70f6ff;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.contact-link strong {
+  color: inherit;
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.contact-link:hover {
+  border-color: rgb(130 255 114 / 58%);
+  box-shadow:
+    0 0 0 1px rgb(130 255 114 / 12%),
+    0 18px 44px rgb(0 0 0 / 26%),
+    0 0 32px rgb(130 255 114 / 12%);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.contact-link.is-visible {
+  border-color: rgb(112 246 255 / 48%);
+}
+
+.contact-links--inline .contact-link span {
+  display: none;
+}
+
+.contact-links--final .contact-link {
+  min-height: 118px;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 16px 16px, rgb(130 255 114 / 18%), transparent 24%),
+    linear-gradient(135deg, rgb(112 246 255 / 11%), transparent 56%),
+    rgb(5 7 13 / 66%);
+}
+
+.contact-links--final .contact-link strong {
+  font-size: clamp(1rem, 2vw, 1.22rem);
+}
+
+.contact-link:focus-visible {
   outline: 2px solid #ff48c4;
   outline-offset: 3px;
 }
@@ -595,6 +707,22 @@ h3 {
     min-height: 50px;
     padding: 10px 12px;
   }
+
+  .contact-section {
+    min-height: auto;
+  }
+
+  .contact-stage {
+    padding: 22px;
+  }
+
+  .contact-links--final {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-links--final .contact-link {
+    min-height: 92px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -605,7 +733,8 @@ h3 {
 
   .experience-entry,
   .experience-entry li,
-  .skill-chip {
+  .skill-chip,
+  .contact-link {
     transition: none;
     will-change: auto;
   }

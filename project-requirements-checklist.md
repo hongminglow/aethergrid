@@ -69,14 +69,14 @@ Use this checklist to track implementation by batch. Each batch should be comple
 
 ## Batch 7 - Contact / Reach-Out Section
 
-- [ ] Add final contact section near the end of the scroll experience.
-- [ ] Render email as a working `mailto:` link.
-- [ ] Render GitHub as an external link.
-- [ ] Render LinkedIn as an external link.
-- [ ] Use safe external link attributes: `target="_blank"` and `rel="noreferrer"`.
-- [ ] Animate contact links into view as the final call-to-action.
-- [ ] Optionally add a compact desktop contact cluster if it does not distract from the scene.
-- [ ] Confirm all links are keyboard accessible.
+- [x] Add final contact section near the end of the scroll experience.
+- [x] Render email as a working `mailto:` link.
+- [x] Render GitHub as an external link.
+- [x] Render LinkedIn as an external link.
+- [x] Use safe external link attributes: `target="_blank"` and `rel="noreferrer"`.
+- [x] Animate contact links into view as the final call-to-action.
+- [x] Optionally add a compact desktop contact cluster if it does not distract from the scene.
+- [x] Confirm all links are keyboard accessible.
 
 ## Batch 8 - Responsive, Accessibility, and Reduced Motion
 

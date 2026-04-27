@@ -53,16 +53,50 @@ const renderSkills = (skills: PortfolioData["skills"]) =>
     )
     .join("");
 
-const renderContactLinks = (data: PortfolioData["contact"]) =>
-  [
-    `<a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a>`,
-    `<a href="${escapeHtml(data.githubUrl)}" target="_blank" rel="noreferrer">GitHub</a>`,
-    `<a href="${escapeHtml(data.linkedInUrl)}" target="_blank" rel="noreferrer">LinkedIn</a>`
-  ].join("");
+const renderContactLinks = (
+  data: PortfolioData["contact"],
+  variant: "inline" | "final"
+) => {
+  const finalAttribute = variant === "final" ? " data-final-contact-link" : "";
+  const links = [
+    {
+      className: "contact-link--email",
+      href: `mailto:${data.email}`,
+      label: data.email,
+      meta: "Email",
+      target: ""
+    },
+    {
+      className: "contact-link--github",
+      href: data.githubUrl,
+      label: "GitHub",
+      meta: "Code",
+      target: ' target="_blank" rel="noreferrer"'
+    },
+    {
+      className: "contact-link--linkedin",
+      href: data.linkedInUrl,
+      label: "LinkedIn",
+      meta: "Network",
+      target: ' target="_blank" rel="noreferrer"'
+    }
+  ];
+
+  return links
+    .map(
+      (link) =>
+        `<a class="contact-link ${link.className}" href="${escapeHtml(link.href)}"${link.target} data-contact-link${finalAttribute}>
+          <span>${escapeHtml(link.meta)}</span>
+          <strong>${escapeHtml(link.label)}</strong>
+        </a>`
+    )
+    .join("");
+};
 
 export const createPortfolioMarkup = (data: PortfolioData) => {
   const introLines = renderIntroLines(data.intro);
-  const contactLinks = renderContactLinks(data.contact);
+  const inlineContactLinks = renderContactLinks(data.contact, "inline");
+  const finalContactLinks = renderContactLinks(data.contact, "final");
 
   return `
     <div id="scene-host" class="scene-host" aria-hidden="true"></div>
@@ -84,7 +118,7 @@ export const createPortfolioMarkup = (data: PortfolioData) => {
           <div class="intro-lines" data-typewriter-root>${introLines}</div>
         </div>
         <nav class="contact-links contact-links--inline" aria-label="Primary contact links">
-          ${contactLinks}
+          ${inlineContactLinks}
         </nav>
       </section>
 
@@ -113,15 +147,19 @@ export const createPortfolioMarkup = (data: PortfolioData) => {
         </div>
       </section>
 
-      <section class="contact-section page-section" aria-labelledby="contact-title">
-        <div class="section-heading">
+      <section class="contact-section page-section" aria-labelledby="contact-title" data-contact-section>
+        <div class="section-heading" data-contact-heading>
           <p class="eyebrow">Open channel</p>
           <h2 id="contact-title">Reach Out</h2>
           <p>Use any active signal below to connect.</p>
         </div>
-        <nav class="contact-links contact-links--final" aria-label="Final contact links">
-          ${contactLinks}
-        </nav>
+        <div class="contact-stage" data-contact-stage>
+          <span class="contact-stage__beam" aria-hidden="true"></span>
+          <span class="contact-stage__node" aria-hidden="true"></span>
+          <nav class="contact-links contact-links--final" aria-label="Final contact links">
+            ${finalContactLinks}
+          </nav>
+        </div>
       </section>
     </main>
   `;

@@ -65,6 +65,14 @@ export const createScrollTimeline = ({
   const skillChips = Array.from(
     document.querySelectorAll<HTMLElement>("[data-skill-chip]")
   );
+  const contactSection =
+    document.querySelector<HTMLElement>("[data-contact-section]");
+  const contactHeading =
+    document.querySelector<HTMLElement>("[data-contact-heading]");
+  const contactStage = document.querySelector<HTMLElement>("[data-contact-stage]");
+  const finalContactLinks = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-final-contact-link]")
+  );
   const triggers: ScrollTrigger[] = [];
   let lastActiveIndex = -1;
 
@@ -101,16 +109,43 @@ export const createScrollTimeline = ({
     onSkillsProgress?.(boundedProgress);
   };
 
+  const updateContactProgress = (progress: number) => {
+    const boundedProgress = clamp01(progress);
+
+    document.documentElement.style.setProperty(
+      "--contact-progress",
+      boundedProgress.toFixed(3)
+    );
+  };
+
   if (reducedMotion) {
-    gsap.set([heading, entries, bullets, skillsHeading, skillsStage, skillChips], {
-      clearProps: "all",
-      opacity: 1
-    });
+    gsap.set(
+      [
+        heading,
+        entries,
+        bullets,
+        skillsHeading,
+        skillsStage,
+        skillChips,
+        contactHeading,
+        contactStage,
+        finalContactLinks
+      ],
+      {
+        clearProps: "all",
+        opacity: 1
+      }
+    );
     skillChips.forEach((chip) => chip.classList.add("is-visible"));
+    finalContactLinks.forEach((link) => link.classList.add("is-visible"));
     updateProgress(getSectionProgress(section));
 
     if (skillsSection) {
       updateSkillsProgress(getSectionProgress(skillsSection));
+    }
+
+    if (contactSection) {
+      updateContactProgress(getSectionProgress(contactSection));
     }
 
     const onScroll = () => {
@@ -118,6 +153,10 @@ export const createScrollTimeline = ({
 
       if (skillsSection) {
         updateSkillsProgress(getSectionProgress(skillsSection));
+      }
+
+      if (contactSection) {
+        updateContactProgress(getSectionProgress(contactSection));
       }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -139,6 +178,16 @@ export const createScrollTimeline = ({
       rotation: -6,
       scale: 0.72,
       y: 34
+    });
+  }
+
+  if (contactHeading && contactStage && finalContactLinks.length > 0) {
+    gsap.set(contactHeading, { autoAlpha: 0, y: 34 });
+    gsap.set(contactStage, { autoAlpha: 0, scale: 0.96, y: 48 });
+    gsap.set(finalContactLinks, {
+      autoAlpha: 0,
+      scale: 0.84,
+      y: 28
     });
   }
 
@@ -276,6 +325,67 @@ export const createScrollTimeline = ({
     }
   }
 
+  if (
+    contactSection &&
+    contactHeading &&
+    contactStage &&
+    finalContactLinks.length > 0
+  ) {
+    const contactProgressTrigger = ScrollTrigger.create({
+      end: "bottom top",
+      onUpdate: (self) => updateContactProgress(self.progress),
+      start: "top bottom",
+      trigger: contactSection
+    });
+    triggers.push(contactProgressTrigger);
+
+    const contactTimeline = gsap.timeline({
+      scrollTrigger: {
+        end: "bottom 42%",
+        start: "top 74%",
+        trigger: contactSection
+      }
+    });
+
+    contactTimeline
+      .to(contactHeading, {
+        autoAlpha: 1,
+        duration: 0.68,
+        ease: "power3.out",
+        y: 0
+      })
+      .to(
+        contactStage,
+        {
+          autoAlpha: 1,
+          duration: 0.72,
+          ease: "power3.out",
+          scale: 1,
+          y: 0
+        },
+        "-=0.42"
+      )
+      .to(
+        finalContactLinks,
+        {
+          autoAlpha: 1,
+          duration: 0.54,
+          ease: "back.out(1.35)",
+          scale: 1,
+          stagger: 0.14,
+          y: 0,
+          onStart: () => {
+            finalContactLinks.forEach((link) => link.classList.add("is-visible"));
+          }
+        },
+        "-=0.28"
+      );
+
+    if (contactTimeline.scrollTrigger) {
+      triggers.push(contactTimeline.scrollTrigger);
+    }
+  }
+
   ScrollTrigger.refresh();
 
   return {
@@ -288,7 +398,10 @@ export const createScrollTimeline = ({
         heroTargets,
         skillsHeading,
         skillsStage,
-        skillChips
+        skillChips,
+        contactHeading,
+        contactStage,
+        finalContactLinks
       ]);
     }
   };
