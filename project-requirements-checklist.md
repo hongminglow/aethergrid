@@ -92,24 +92,24 @@ Use this checklist to track implementation by batch. Each batch should be comple
 
 ## Batch 9 - Performance and Technical Hardening
 
-- [ ] Keep draw calls and geometry count controlled.
-- [ ] Avoid unnecessarily large textures.
-- [ ] Keep post-processing optional and performant.
-- [ ] Pause or reduce expensive updates when the tab is hidden.
-- [ ] Handle resize cleanly.
-- [ ] Avoid memory leaks from abandoned geometries, materials, or event listeners.
-- [ ] Run TypeScript/build verification.
-- [ ] Fix runtime console errors.
+- [x] Keep draw calls and geometry count controlled.
+- [x] Avoid unnecessarily large textures.
+- [x] Keep post-processing optional and performant.
+- [x] Pause or reduce expensive updates when the tab is hidden.
+- [x] Handle resize cleanly.
+- [x] Avoid memory leaks from abandoned geometries, materials, or event listeners.
+- [x] Run TypeScript/build verification.
+- [x] Fix runtime console errors.
 
 ## Batch 10 - Final QA and Delivery
 
-- [ ] Compare implementation against `fantasy-cyberpunk-portfolio-spec.md`.
-- [ ] Confirm all required sections exist.
-- [ ] Confirm data file edits update the UI correctly.
-- [ ] Confirm first viewport shows name, title, and intro.
-- [ ] Confirm experience scroll animation works.
-- [ ] Confirm skills scroll animation works with 10 to 20+ skills.
-- [ ] Confirm contact links work.
-- [ ] Confirm visual direction is clearly cyberpunk, futuristic, and fantasy-inspired.
-- [ ] Confirm production build succeeds.
-- [ ] Document how to run and edit the project in `README.md`.
+- [x] Compare implementation against `fantasy-cyberpunk-portfolio-spec.md`.
+- [x] Confirm all required sections exist.
+- [x] Confirm data file edits update the UI correctly.
+- [x] Confirm first viewport shows name, title, and intro.
+- [x] Confirm experience scroll animation works.
+- [x] Confirm skills scroll animation works with 10 to 20+ skills.
+- [x] Confirm contact links work.
+- [x] Confirm visual direction is clearly cyberpunk, futuristic, and fantasy-inspired.
+- [x] Confirm production build succeeds.
+- [x] Document how to run and edit the project in `README.md`.

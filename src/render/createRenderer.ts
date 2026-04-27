@@ -1,8 +1,4 @@
-import {
-  PCFSoftShadowMap,
-  SRGBColorSpace,
-  WebGLRenderer
-} from "three";
+import { SRGBColorSpace, WebGLRenderer } from "three";
 
 export type RendererHandle = {
   renderer: WebGLRenderer;
@@ -20,8 +16,14 @@ const createWebGLRenderer = (antialias: boolean) =>
     alpha: true,
     antialias,
     preserveDrawingBuffer: false,
-    powerPreference: "default"
+    powerPreference: "high-performance"
   });
+
+const getPixelRatio = () => {
+  const performanceCap = window.innerWidth < 768 ? 1.35 : 1.75;
+
+  return Math.min(window.devicePixelRatio || 1, performanceCap);
+};
 
 export const createRenderer = (host: HTMLElement): RendererHandle => {
   let renderer: WebGLRenderer;
@@ -34,15 +36,29 @@ export const createRenderer = (host: HTMLElement): RendererHandle => {
 
   renderer.domElement.className = "webgl-canvas";
   renderer.outputColorSpace = SRGBColorSpace;
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.shadowMap.enabled = false;
   renderer.setClearColor(0x05070d, 0);
+  let lastWidth = 0;
+  let lastHeight = 0;
+  let lastPixelRatio = 0;
 
   const resize = () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = Math.max(1, window.innerWidth);
+    const height = Math.max(1, window.innerHeight);
+    const pixelRatio = getPixelRatio();
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    if (
+      width === lastWidth &&
+      height === lastHeight &&
+      pixelRatio === lastPixelRatio
+    ) {
+      return;
+    }
+
+    lastWidth = width;
+    lastHeight = height;
+    lastPixelRatio = pixelRatio;
+    renderer.setPixelRatio(pixelRatio);
     renderer.setSize(width, height, false);
   };
 

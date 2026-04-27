@@ -25,7 +25,7 @@ The goal is not a generic resume grid. The experience should feel like entering 
 - GSAP ScrollTrigger or equivalent scroll animation system
 - HTML/CSS DOM overlays for readable content
 
-## Planned Architecture
+## Architecture
 
 ```txt
 src/
@@ -68,6 +68,32 @@ That file should control:
 - Job experience entries
 - Skills
 
+## Run Locally
+
+Install dependencies once:
+
+```sh
+npm install
+```
+
+Start the local dev server:
+
+```sh
+npm run dev
+```
+
+Create a production build:
+
+```sh
+npm run build
+```
+
+Preview the production build:
+
+```sh
+npm run preview
+```
+
 ## Project Documents
 
 - `fantasy-cyberpunk-portfolio-spec.md` contains the full product and implementation spec.
@@ -75,4 +101,4 @@ That file should control:
 
 ## Current Status
 
-Batch 8 is complete. The repository now contains the Vite + TypeScript scaffold, core dependencies, editable portfolio data file, data-driven DOM sections, the first Three.js cyberpunk fantasy visual foundation, a cinematic opening identity scene with typewriter intro reveal, scroll-triggered experience sequence, scroll-triggered skill matrix, animated reach-out terminal, responsive layout hardening, keyboard-accessible contact flow, and `prefers-reduced-motion` handling.
+Final delivery is complete. The repository contains the Vite + TypeScript scaffold, editable portfolio data file, data-driven DOM sections, Three.js cyberpunk fantasy visual foundation, cinematic opening identity scene with typewriter intro reveal, scroll-triggered experience sequence, scroll-triggered skill matrix, animated reach-out terminal, responsive layout hardening, keyboard-accessible contact flow, `prefers-reduced-motion` handling, performance hardening, and final QA coverage.

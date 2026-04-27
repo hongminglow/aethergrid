@@ -28,21 +28,14 @@ export type NeonEffects = {
   dispose: () => void;
 };
 
-const disposableMaterials: Array<
-  MeshBasicMaterial | MeshStandardMaterial | LineBasicMaterial
-> = [];
+type DisposableEffectMaterial =
+  | MeshBasicMaterial
+  | MeshStandardMaterial
+  | LineBasicMaterial;
 
-const trackMaterial = <
-  T extends MeshBasicMaterial | MeshStandardMaterial | LineBasicMaterial
->(
-  material: T
-) => {
-  disposableMaterials.push(material);
+type TrackMaterial = <T extends DisposableEffectMaterial>(material: T) => T;
 
-  return material;
-};
-
-const createPortal = () => {
+const createPortal = (trackMaterial: TrackMaterial) => {
   const group = new Group();
   const cyan = trackMaterial(
     new MeshBasicMaterial({
@@ -96,7 +89,7 @@ const createPortal = () => {
   return { group, outer, middle, inner, core };
 };
 
-const createShards = () => {
+const createShards = (trackMaterial: TrackMaterial) => {
   const group = new Group();
   const geometry = new OctahedronGeometry(0.22, 0);
   const material = trackMaterial(
@@ -151,8 +144,14 @@ const createGrid = () => {
 
 export const createEffects = (): NeonEffects => {
   const group = new Group();
-  const portal = createPortal();
-  const shards = createShards();
+  const disposableMaterials: DisposableEffectMaterial[] = [];
+  const trackMaterial: TrackMaterial = (material) => {
+    disposableMaterials.push(material);
+
+    return material;
+  };
+  const portal = createPortal(trackMaterial);
+  const shards = createShards(trackMaterial);
   const grid = createGrid();
   const scanColumn = new Mesh(
     new CylinderGeometry(0.02, 0.02, 8, 12, 1, true),
@@ -172,7 +171,14 @@ export const createEffects = (): NeonEffects => {
   accentLight.position.set(-3.8, 2.4, -1.5);
   portalLight.position.copy(portal.group.position);
 
-  group.add(grid, portal.group, shards.group, scanColumn, portalLight, accentLight);
+  group.add(
+    grid,
+    portal.group,
+    shards.group,
+    scanColumn,
+    portalLight,
+    accentLight
+  );
 
   return {
     group,

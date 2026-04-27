@@ -1,6 +1,8 @@
 import { Clock, Vector2 } from "three";
 import { createScrollTimeline } from "./animation/scrollTimeline";
+import type { ScrollTimelineHandle } from "./animation/scrollTimeline";
 import { createTypewriter } from "./animation/typewriter";
+import type { TypewriterHandle } from "./animation/typewriter";
 import { portfolioData } from "./data/portfolioData";
 import { createCameraRig } from "./render/cameraRig";
 import { createRenderer, isWebGLAvailable } from "./render/createRenderer";
@@ -26,6 +28,8 @@ let isReducedMotion = reduceMotionQuery.matches;
 let introProgress = reduceMotionQuery.matches ? 1 : 0;
 let experienceProgress = 0;
 let skillsProgress = 0;
+let scrollTimeline: ScrollTimelineHandle | undefined;
+let typewriter: TypewriterHandle | undefined;
 
 document.documentElement.dataset.motion = isReducedMotion
   ? "reduced"
@@ -40,7 +44,11 @@ const updateMotionPreference = (event: MediaQueryListEvent) => {
   if (isReducedMotion) {
     introProgress = 1;
     document.documentElement.style.setProperty("--intro-progress", "1");
+    typewriter?.complete();
   }
+
+  scrollTimeline?.destroy();
+  scrollTimeline = createPortfolioScrollTimeline();
 };
 
 const showFallback = () => {
@@ -71,11 +79,23 @@ const startAetherScene = (host: HTMLElement) => {
   const clock = new Clock();
   const pointer = new Vector2(0, 0);
   let frameId = 0;
+  let resizeFrameId = 0;
   let isRunning = true;
 
-  const resize = () => {
+  const resizeNow = () => {
     rendererHandle.resize();
     cameraRig.resize();
+  };
+
+  const scheduleResize = () => {
+    if (resizeFrameId !== 0) {
+      return;
+    }
+
+    resizeFrameId = window.requestAnimationFrame(() => {
+      resizeFrameId = 0;
+      resizeNow();
+    });
   };
 
   const updatePointer = (event: PointerEvent) => {
@@ -117,15 +137,22 @@ const startAetherScene = (host: HTMLElement) => {
   };
 
   const handleVisibilityChange = () => {
-    isRunning = document.visibilityState === "visible";
+    if (document.visibilityState === "visible") {
+      if (isRunning) {
+        return;
+      }
 
-    if (isRunning) {
+      isRunning = true;
       clock.start();
       frameId = window.requestAnimationFrame(tick);
-    } else {
-      window.cancelAnimationFrame(frameId);
-      clock.stop();
+
+      return;
     }
+
+    isRunning = false;
+    window.cancelAnimationFrame(frameId);
+    frameId = 0;
+    clock.stop();
   };
 
   const handleContextLoss = (event: Event) => {
@@ -135,18 +162,19 @@ const startAetherScene = (host: HTMLElement) => {
     window.cancelAnimationFrame(frameId);
   };
 
-  window.addEventListener("resize", resize);
+  window.addEventListener("resize", scheduleResize);
   window.addEventListener("pointermove", updatePointer, { passive: true });
   document.addEventListener("visibilitychange", handleVisibilityChange);
   rendererHandle.canvas.addEventListener("webglcontextlost", handleContextLoss);
 
-  resize();
+  resizeNow();
   tick();
 
   return () => {
     isRunning = false;
     window.cancelAnimationFrame(frameId);
-    window.removeEventListener("resize", resize);
+    window.cancelAnimationFrame(resizeFrameId);
+    window.removeEventListener("resize", scheduleResize);
     window.removeEventListener("pointermove", updatePointer);
     document.removeEventListener("visibilitychange", handleVisibilityChange);
     rendererHandle.canvas.removeEventListener(
@@ -158,7 +186,17 @@ const startAetherScene = (host: HTMLElement) => {
   };
 };
 
-reduceMotionQuery.addEventListener("change", updateMotionPreference);
+function createPortfolioScrollTimeline() {
+  return createScrollTimeline({
+    reducedMotion: isReducedMotion,
+    onExperienceProgress: (progress) => {
+      experienceProgress = progress;
+    },
+    onSkillsProgress: (progress) => {
+      skillsProgress = progress;
+    }
+  });
+}
 
 if (!sceneHost || !isWebGLAvailable()) {
   showFallback();
@@ -175,11 +213,11 @@ if (!sceneHost || !isWebGLAvailable()) {
 }
 
 if (typewriterRoot) {
-  const typewriter = createTypewriter({
+  typewriter = createTypewriter({
     root: typewriterRoot,
     characterDelayMs: 17,
     lineDelayMs: 130,
-    reducedMotion: reduceMotionQuery.matches,
+    reducedMotion: isReducedMotion,
     onProgress: (progress) => {
       introProgress = progress;
       document.documentElement.style.setProperty(
@@ -192,23 +230,16 @@ if (typewriterRoot) {
   typewriter.start();
 
   if (import.meta.hot) {
-    import.meta.hot.dispose(typewriter.stop);
+    import.meta.hot.dispose(() => typewriter?.stop());
   }
 }
 
-const scrollTimeline = createScrollTimeline({
-  reducedMotion: reduceMotionQuery.matches,
-  onExperienceProgress: (progress) => {
-    experienceProgress = progress;
-  },
-  onSkillsProgress: (progress) => {
-    skillsProgress = progress;
-  }
-});
+scrollTimeline = createPortfolioScrollTimeline();
+reduceMotionQuery.addEventListener("change", updateMotionPreference);
 
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
     reduceMotionQuery.removeEventListener("change", updateMotionPreference);
-    scrollTimeline.destroy();
+    scrollTimeline?.destroy();
   });
 }
