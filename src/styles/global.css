@@ -14,6 +14,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+  overflow-x: clip;
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -23,6 +28,7 @@ body {
   min-height: 100vh;
   margin: 0;
   background: #05070d;
+  overflow-x: clip;
 }
 
 #app {
@@ -32,6 +38,30 @@ body {
 
 a {
   color: inherit;
+}
+
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  z-index: 10;
+  padding: 10px 12px;
+  border: 1px solid rgb(130 255 114 / 64%);
+  background: rgb(5 7 13 / 92%);
+  color: #ffffff;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.86rem;
+  text-decoration: none;
+  transform: translateY(-140%);
+  transition: transform 180ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+#content:focus {
+  outline: none;
 }
 
 .scene-host {
@@ -79,6 +109,7 @@ a {
   position: relative;
   z-index: 2;
   min-height: 100vh;
+  overflow: clip;
   padding: 32px;
   background:
     radial-gradient(circle at 15% 20%, rgb(39 219 255 / 16%), transparent 28%),
@@ -470,6 +501,14 @@ h3 {
   will-change: opacity, transform;
 }
 
+.skill-chip__label {
+  position: relative;
+  z-index: 1;
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
 .skill-chip::before {
   content: "";
   position: absolute;
@@ -646,6 +685,28 @@ h3 {
   outline-offset: 3px;
 }
 
+@media (width <= 900px) {
+  .portfolio-shell {
+    padding: 28px;
+  }
+
+  .page-section {
+    padding: 96px 0;
+  }
+
+  .skills-stage {
+    min-height: auto;
+  }
+
+  .contact-links--final {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-links--final .contact-link {
+    min-height: 96px;
+  }
+}
+
 @media (width <= 640px) {
   .portfolio-shell {
     padding: 24px;
@@ -726,6 +787,10 @@ h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .hero-orbital span,
   .intro-lines[data-typewriter-status="running"] p[data-typewriter-state="active"]::after {
     animation: none;
@@ -734,7 +799,8 @@ h3 {
   .experience-entry,
   .experience-entry li,
   .skill-chip,
-  .contact-link {
+  .contact-link,
+  .skip-link {
     transition: none;
     will-change: auto;
   }
@@ -744,5 +810,13 @@ h3 {
   .skills-stage__ring,
   .skills-stage__core {
     transform: translate(-50%, -50%);
+  }
+
+  .contact-stage__beam {
+    transform: translate(-50%, -50%);
+  }
+
+  .contact-stage__node {
+    transform: none;
   }
 }

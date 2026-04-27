@@ -80,15 +80,15 @@ Use this checklist to track implementation by batch. Each batch should be comple
 
 ## Batch 8 - Responsive, Accessibility, and Reduced Motion
 
-- [ ] Verify desktop layout.
-- [ ] Verify tablet layout.
-- [ ] Verify mobile layout.
-- [ ] Ensure text never overlaps or overflows its container.
-- [ ] Add `prefers-reduced-motion` handling.
-- [ ] Keep semantic HTML for all readable content.
-- [ ] Ensure keyboard navigation reaches contact links.
-- [ ] Ensure color contrast is readable.
-- [ ] Confirm portfolio content remains understandable without relying on WebGL text.
+- [x] Verify desktop layout.
+- [x] Verify tablet layout.
+- [x] Verify mobile layout.
+- [x] Ensure text never overlaps or overflows its container.
+- [x] Add `prefers-reduced-motion` handling.
+- [x] Keep semantic HTML for all readable content.
+- [x] Ensure keyboard navigation reaches contact links.
+- [x] Ensure color contrast is readable.
+- [x] Confirm portfolio content remains understandable without relying on WebGL text.
 
 ## Batch 9 - Performance and Technical Hardening
 

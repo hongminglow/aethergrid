@@ -75,4 +75,4 @@ That file should control:
 
 ## Current Status
 
-Batch 7 is complete. The repository now contains the Vite + TypeScript scaffold, core dependencies, editable portfolio data file, data-driven DOM sections, the first Three.js cyberpunk fantasy visual foundation, a cinematic opening identity scene with typewriter intro reveal, scroll-triggered experience sequence, scroll-triggered skill matrix, and animated reach-out terminal.
+Batch 8 is complete. The repository now contains the Vite + TypeScript scaffold, core dependencies, editable portfolio data file, data-driven DOM sections, the first Three.js cyberpunk fantasy visual foundation, a cinematic opening identity scene with typewriter intro reveal, scroll-triggered experience sequence, scroll-triggered skill matrix, animated reach-out terminal, responsive layout hardening, keyboard-accessible contact flow, and `prefers-reduced-motion` handling.

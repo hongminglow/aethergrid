@@ -49,7 +49,7 @@ const renderSkills = (skills: PortfolioData["skills"]) =>
   skills
     .map(
       (skill, index) =>
-        `<li class="skill-chip" data-skill-chip data-skill-index="${index + 1}" style="--skill-index: ${index}; --skill-count: ${skills.length}">${escapeHtml(skill)}</li>`
+        `<li class="skill-chip" data-skill-chip data-skill-index="${index + 1}" style="--skill-index: ${index}; --skill-count: ${skills.length}"><span class="skill-chip__label">${escapeHtml(skill)}</span></li>`
     )
     .join("");
 
@@ -99,11 +99,12 @@ export const createPortfolioMarkup = (data: PortfolioData) => {
   const finalContactLinks = renderContactLinks(data.contact, "final");
 
   return `
+    <a class="skip-link" href="#content">Skip to content</a>
     <div id="scene-host" class="scene-host" aria-hidden="true"></div>
     <p id="webgl-fallback" class="webgl-fallback" role="status" hidden>
       WebGL scene unavailable. Portfolio content remains available below.
     </p>
-    <main class="portfolio-shell">
+    <main id="content" class="portfolio-shell" tabindex="-1">
       <section class="hero-section page-section" aria-labelledby="intro-title">
         <div class="hero-orbital" aria-hidden="true">
           <span></span>

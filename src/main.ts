@@ -22,9 +22,26 @@ const typewriterRoot = document.querySelector<HTMLElement>(
   "[data-typewriter-root]"
 );
 const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+let isReducedMotion = reduceMotionQuery.matches;
 let introProgress = reduceMotionQuery.matches ? 1 : 0;
 let experienceProgress = 0;
 let skillsProgress = 0;
+
+document.documentElement.dataset.motion = isReducedMotion
+  ? "reduced"
+  : "full";
+
+const updateMotionPreference = (event: MediaQueryListEvent) => {
+  isReducedMotion = event.matches;
+  document.documentElement.dataset.motion = isReducedMotion
+    ? "reduced"
+    : "full";
+
+  if (isReducedMotion) {
+    introProgress = 1;
+    document.documentElement.style.setProperty("--intro-progress", "1");
+  }
+};
 
 const showFallback = () => {
   if (fallback) {
@@ -62,6 +79,12 @@ const startAetherScene = (host: HTMLElement) => {
   };
 
   const updatePointer = (event: PointerEvent) => {
+    if (isReducedMotion) {
+      pointer.set(0, 0);
+
+      return;
+    }
+
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = -((event.clientY / window.innerHeight) * 2 - 1);
   };
@@ -71,7 +94,7 @@ const startAetherScene = (host: HTMLElement) => {
       return;
     }
 
-    const elapsed = clock.getElapsedTime();
+    const elapsed = isReducedMotion ? 0 : clock.getElapsedTime();
     const scrollProgress = getScrollProgress();
 
     aetherScene.update(
@@ -135,6 +158,8 @@ const startAetherScene = (host: HTMLElement) => {
   };
 };
 
+reduceMotionQuery.addEventListener("change", updateMotionPreference);
+
 if (!sceneHost || !isWebGLAvailable()) {
   showFallback();
 } else {
@@ -182,5 +207,8 @@ const scrollTimeline = createScrollTimeline({
 });
 
 if (import.meta.hot) {
-  import.meta.hot.dispose(scrollTimeline.destroy);
+  import.meta.hot.dispose(() => {
+    reduceMotionQuery.removeEventListener("change", updateMotionPreference);
+    scrollTimeline.destroy();
+  });
 }
