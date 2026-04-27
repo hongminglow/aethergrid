@@ -12,25 +12,25 @@ export type RendererHandle = {
 };
 
 export const isWebGLAvailable = () => {
-  try {
-    const canvas = document.createElement("canvas");
-
-    return Boolean(
-      (window.WebGL2RenderingContext && canvas.getContext("webgl2")) ||
-        (window.WebGLRenderingContext && canvas.getContext("webgl"))
-    );
-  } catch {
-    return false;
-  }
+  return Boolean(window.WebGL2RenderingContext || window.WebGLRenderingContext);
 };
 
-export const createRenderer = (host: HTMLElement): RendererHandle => {
-  const renderer = new WebGLRenderer({
+const createWebGLRenderer = (antialias: boolean) =>
+  new WebGLRenderer({
     alpha: true,
-    antialias: true,
+    antialias,
     preserveDrawingBuffer: import.meta.env.DEV,
-    powerPreference: "high-performance"
+    powerPreference: "default"
   });
+
+export const createRenderer = (host: HTMLElement): RendererHandle => {
+  let renderer: WebGLRenderer;
+
+  try {
+    renderer = createWebGLRenderer(true);
+  } catch {
+    renderer = createWebGLRenderer(false);
+  }
 
   renderer.domElement.className = "webgl-canvas";
   renderer.outputColorSpace = SRGBColorSpace;

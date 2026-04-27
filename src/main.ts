@@ -1,4 +1,5 @@
 import { Clock, Vector2 } from "three";
+import { createScrollTimeline } from "./animation/scrollTimeline";
 import { createTypewriter } from "./animation/typewriter";
 import { portfolioData } from "./data/portfolioData";
 import { createCameraRig } from "./render/cameraRig";
@@ -22,6 +23,7 @@ const typewriterRoot = document.querySelector<HTMLElement>(
 );
 const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 let introProgress = reduceMotionQuery.matches ? 1 : 0;
+let experienceProgress = 0;
 
 const showFallback = () => {
   if (fallback) {
@@ -71,8 +73,19 @@ const startAetherScene = (host: HTMLElement) => {
     const elapsed = clock.getElapsedTime();
     const scrollProgress = getScrollProgress();
 
-    aetherScene.update(elapsed, scrollProgress, introProgress);
-    cameraRig.update(elapsed, pointer, scrollProgress, introProgress);
+    aetherScene.update(
+      elapsed,
+      scrollProgress,
+      introProgress,
+      experienceProgress
+    );
+    cameraRig.update(
+      elapsed,
+      pointer,
+      scrollProgress,
+      introProgress,
+      experienceProgress
+    );
     rendererHandle.renderer.render(aetherScene.scene, cameraRig.camera);
     frameId = window.requestAnimationFrame(tick);
   };
@@ -153,4 +166,15 @@ if (typewriterRoot) {
   if (import.meta.hot) {
     import.meta.hot.dispose(typewriter.stop);
   }
+}
+
+const scrollTimeline = createScrollTimeline({
+  reducedMotion: reduceMotionQuery.matches,
+  onExperienceProgress: (progress) => {
+    experienceProgress = progress;
+  }
+});
+
+if (import.meta.hot) {
+  import.meta.hot.dispose(scrollTimeline.destroy);
 }

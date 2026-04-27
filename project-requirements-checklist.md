@@ -51,13 +51,13 @@ Use this checklist to track implementation by batch. Each batch should be comple
 
 ## Batch 5 - Scroll-Triggered Experience Sequence
 
-- [ ] Set up scroll-trigger animation system.
-- [ ] Animate transition from opening scene into experience section.
-- [ ] Reveal experience entries staggerly during scroll.
-- [ ] Reveal bullet points one by one inside each experience entry.
-- [ ] Highlight active experience entry.
-- [ ] Make Three.js background react to experience scroll progress.
-- [ ] Ensure experience content remains readable and accessible.
+- [x] Set up scroll-trigger animation system.
+- [x] Animate transition from opening scene into experience section.
+- [x] Reveal experience entries staggerly during scroll.
+- [x] Reveal bullet points one by one inside each experience entry.
+- [x] Highlight active experience entry.
+- [x] Make Three.js background react to experience scroll progress.
+- [x] Ensure experience content remains readable and accessible.
 
 ## Batch 6 - Scroll-Triggered Skills Sequence
 

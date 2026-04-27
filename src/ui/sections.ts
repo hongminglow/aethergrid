@@ -25,11 +25,14 @@ const renderExperienceEntries = (experiences: PortfolioData["experiences"]) =>
   experiences
     .map((experience, index) => {
       const description = experience.description
-        .map((item) => `<li>${escapeHtml(item)}</li>`)
+        .map(
+          (item) =>
+            `<li data-experience-bullet>${escapeHtml(item)}</li>`
+        )
         .join("");
 
       return `
-        <article class="experience-entry" data-entry-index="${index + 1}">
+        <article class="experience-entry" data-experience-entry data-entry-index="${index + 1}">
           <div class="experience-entry__meta">
             <span>${escapeHtml(experience.period)}</span>
             <span>${String(index + 1).padStart(2, "0")}</span>
@@ -85,8 +88,8 @@ export const createPortfolioMarkup = (data: PortfolioData) => {
         </nav>
       </section>
 
-      <section class="experience-section page-section" aria-labelledby="experience-title">
-        <div class="section-heading">
+      <section class="experience-section page-section" aria-labelledby="experience-title" data-experience-section>
+        <div class="section-heading" data-experience-heading>
           <p class="eyebrow">Experience signal</p>
           <h2 id="experience-title">${escapeHtml(data.experienceSummary.totalYears)}</h2>
           <p>${escapeHtml(data.experienceSummary.headline)}</p>

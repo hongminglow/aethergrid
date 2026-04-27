@@ -21,7 +21,8 @@ export type NeonEffects = {
   update: (
     elapsed: number,
     scrollProgress: number,
-    introProgress: number
+    introProgress: number,
+    experienceProgress: number
   ) => void;
   dispose: () => void;
 };
@@ -174,8 +175,12 @@ export const createEffects = (): NeonEffects => {
 
   return {
     group,
-    update: (elapsed, scrollProgress, introProgress) => {
-      const pulse = 0.92 + introProgress * 0.18 + Math.sin(elapsed * 1.4) * 0.025;
+    update: (elapsed, scrollProgress, introProgress, experienceProgress) => {
+      const pulse =
+        0.92 +
+        introProgress * 0.18 +
+        experienceProgress * 0.12 +
+        Math.sin(elapsed * 1.4) * 0.025;
 
       portal.outer.rotation.z = elapsed * 0.32;
       portal.middle.rotation.z = -elapsed * 0.45;
@@ -185,17 +190,28 @@ export const createEffects = (): NeonEffects => {
       portal.core.scale.setScalar(pulse);
       portal.outer.scale.setScalar(0.96 + introProgress * 0.08);
       portal.middle.scale.setScalar(1.04 - introProgress * 0.05);
-      portal.group.position.y = 1.08 + Math.sin(elapsed * 0.82) * 0.12;
-      portal.group.rotation.y = -0.45 + scrollProgress * 0.22;
-      portalLight.intensity = 18 + introProgress * 18;
-      accentLight.intensity = 9 + introProgress * 10;
+      portal.group.position.set(
+        2.75 - experienceProgress * 1.08,
+        1.08 + Math.sin(elapsed * 0.82) * 0.12,
+        -2.5 - experienceProgress * 0.58
+      );
+      portal.group.rotation.y =
+        -0.45 + scrollProgress * 0.22 + experienceProgress * 0.32;
+      portalLight.position.copy(portal.group.position);
+      portalLight.intensity = 18 + introProgress * 18 + experienceProgress * 16;
+      accentLight.intensity = 9 + introProgress * 10 + experienceProgress * 8;
 
-      shards.group.rotation.y = elapsed * 0.08 + scrollProgress * 1.2;
-      shards.group.rotation.x = Math.sin(elapsed * 0.2) * 0.08;
+      shards.group.rotation.y =
+        elapsed * 0.08 + scrollProgress * 1.2 + experienceProgress * 1.8;
+      shards.group.rotation.x =
+        Math.sin(elapsed * 0.2) * 0.08 + experienceProgress * 0.18;
+      shards.group.position.z = -experienceProgress * 1.2;
 
-      grid.position.z = -8 + scrollProgress * 4;
+      grid.position.z = -8 + scrollProgress * 4 + experienceProgress * 1.8;
       scanColumn.rotation.y = elapsed * 0.65;
-      scanColumn.position.y = 0.4 + Math.sin(elapsed * 1.2) * 0.4;
+      scanColumn.scale.setScalar(1 + experienceProgress * 2.2);
+      scanColumn.position.y =
+        0.4 + Math.sin(elapsed * 1.2) * 0.4 + experienceProgress * 0.5;
     },
     dispose: () => {
       portal.outer.geometry.dispose();

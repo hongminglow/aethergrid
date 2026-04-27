@@ -14,7 +14,8 @@ export type AetherScene = {
   update: (
     elapsed: number,
     scrollProgress: number,
-    introProgress: number
+    introProgress: number,
+    experienceProgress: number
   ) => void;
   dispose: () => void;
 };
@@ -37,11 +38,17 @@ export const createScene = (): AetherScene => {
 
   return {
     scene,
-    update: (elapsed, scrollProgress, introProgress) => {
-      root.rotation.y = Math.sin(elapsed * 0.08) * 0.035;
+    update: (elapsed, scrollProgress, introProgress, experienceProgress) => {
+      root.rotation.y =
+        Math.sin(elapsed * 0.08) * 0.035 - experienceProgress * 0.08;
       root.position.y = Math.sin(elapsed * 0.22) * 0.06;
       particles.update(elapsed, scrollProgress);
-      effects.update(elapsed, scrollProgress, introProgress);
+      effects.update(
+        elapsed,
+        scrollProgress,
+        introProgress,
+        experienceProgress
+      );
     },
     dispose: () => {
       particles.dispose();
