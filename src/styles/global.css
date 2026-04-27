@@ -21,17 +21,65 @@ body {
   background: #05070d;
 }
 
+#app {
+  min-height: 100vh;
+  isolation: isolate;
+}
+
 a {
   color: inherit;
 }
 
+.scene-host {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 52% 45%, rgb(112 246 255 / 16%), transparent 32%),
+    linear-gradient(135deg, #05070d 0%, #07101b 48%, #110812 100%);
+}
+
+.scene-host[hidden] {
+  display: none;
+}
+
+.webgl-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.webgl-fallback {
+  position: fixed;
+  left: 50%;
+  top: 18px;
+  z-index: 4;
+  max-width: min(440px, calc(100vw - 32px));
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid rgb(112 246 255 / 38%);
+  background: rgb(5 7 13 / 88%);
+  color: rgb(245 251 255 / 88%);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  transform: translateX(-50%);
+}
+
+.webgl-fallback[hidden] {
+  display: none;
+}
+
 .portfolio-shell {
+  position: relative;
+  z-index: 2;
   min-height: 100vh;
   padding: 32px;
   background:
-    radial-gradient(circle at 20% 20%, rgb(39 219 255 / 22%), transparent 30%),
-    radial-gradient(circle at 80% 30%, rgb(255 42 172 / 18%), transparent 28%),
-    linear-gradient(135deg, #05070d 0%, #09111f 48%, #120717 100%);
+    radial-gradient(circle at 15% 20%, rgb(39 219 255 / 16%), transparent 28%),
+    radial-gradient(circle at 82% 30%, rgb(255 42 172 / 12%), transparent 26%),
+    linear-gradient(135deg, rgb(5 7 13 / 72%) 0%, rgb(9 17 31 / 54%) 48%, rgb(18 7 23 / 72%) 100%);
 }
 
 .page-section {

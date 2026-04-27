@@ -75,4 +75,4 @@ That file should control:
 
 ## Current Status
 
-Batch 2 is complete. The repository now contains the Vite + TypeScript scaffold, core dependencies, starter source structure, editable portfolio data file, and data-driven DOM sections for identity, experience, skills, and contact.
+Batch 3 is complete. The repository now contains the Vite + TypeScript scaffold, core dependencies, editable portfolio data file, data-driven DOM sections, and the first Three.js cyberpunk fantasy visual foundation.

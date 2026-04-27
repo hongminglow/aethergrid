@@ -30,15 +30,15 @@ Use this checklist to track implementation by batch. Each batch should be comple
 
 ## Batch 3 - Three.js Visual Foundation
 
-- [ ] Create Three.js renderer, scene, camera, and animation loop.
-- [ ] Add responsive canvas sizing.
-- [ ] Add cyberpunk fantasy background visuals.
-- [ ] Add animated particle field.
-- [ ] Add neon grid, portal, energy core, holographic shards, or equivalent focal object.
-- [ ] Add lighting and material treatment that supports the cyberpunk fantasy mood.
-- [ ] Add subtle mouse or pointer parallax.
-- [ ] Keep readable text outside WebGL.
-- [ ] Add graceful fallback message for WebGL failure.
+- [x] Create Three.js renderer, scene, camera, and animation loop.
+- [x] Add responsive canvas sizing.
+- [x] Add cyberpunk fantasy background visuals.
+- [x] Add animated particle field.
+- [x] Add neon grid, portal, energy core, holographic shards, or equivalent focal object.
+- [x] Add lighting and material treatment that supports the cyberpunk fantasy mood.
+- [x] Add subtle mouse or pointer parallax.
+- [x] Keep readable text outside WebGL.
+- [x] Add graceful fallback message for WebGL failure.
 
 ## Batch 4 - Opening Identity Scene
 

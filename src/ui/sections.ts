@@ -57,6 +57,10 @@ export const createPortfolioMarkup = (data: PortfolioData) => {
   const contactLinks = renderContactLinks(data.contact);
 
   return `
+    <div id="scene-host" class="scene-host" aria-hidden="true"></div>
+    <p id="webgl-fallback" class="webgl-fallback" role="status" hidden>
+      WebGL scene unavailable. Portfolio content remains available below.
+    </p>
     <main class="portfolio-shell">
       <section class="hero-section page-section" aria-labelledby="intro-title">
         <p class="eyebrow">Aethergrid foundation</p>
