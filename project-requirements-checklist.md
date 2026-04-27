@@ -42,12 +42,12 @@ Use this checklist to track implementation by batch. Each batch should be comple
 
 ## Batch 4 - Opening Identity Scene
 
-- [ ] Make the first viewport cinematic and visually strong.
-- [ ] Show developer name as the dominant first signal.
-- [ ] Show title clearly near the name.
-- [ ] Implement typewriter reveal for intro lines.
-- [ ] Synchronize opening text reveal with subtle scene motion.
-- [ ] Ensure first viewport remains readable on desktop and mobile.
+- [x] Make the first viewport cinematic and visually strong.
+- [x] Show developer name as the dominant first signal.
+- [x] Show title clearly near the name.
+- [x] Implement typewriter reveal for intro lines.
+- [x] Synchronize opening text reveal with subtle scene motion.
+- [x] Ensure first viewport remains readable on desktop and mobile.
 
 ## Batch 5 - Scroll-Triggered Experience Sequence
 

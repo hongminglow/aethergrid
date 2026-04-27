@@ -1,4 +1,5 @@
 import { Clock, Vector2 } from "three";
+import { createTypewriter } from "./animation/typewriter";
 import { portfolioData } from "./data/portfolioData";
 import { createCameraRig } from "./render/cameraRig";
 import { createRenderer, isWebGLAvailable } from "./render/createRenderer";
@@ -16,6 +17,11 @@ app.innerHTML = createPortfolioMarkup(portfolioData);
 
 const sceneHost = document.querySelector<HTMLElement>("#scene-host");
 const fallback = document.querySelector<HTMLElement>("#webgl-fallback");
+const typewriterRoot = document.querySelector<HTMLElement>(
+  "[data-typewriter-root]"
+);
+const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+let introProgress = reduceMotionQuery.matches ? 1 : 0;
 
 const showFallback = () => {
   if (fallback) {
@@ -65,8 +71,8 @@ const startAetherScene = (host: HTMLElement) => {
     const elapsed = clock.getElapsedTime();
     const scrollProgress = getScrollProgress();
 
-    aetherScene.update(elapsed, scrollProgress);
-    cameraRig.update(elapsed, pointer, scrollProgress);
+    aetherScene.update(elapsed, scrollProgress, introProgress);
+    cameraRig.update(elapsed, pointer, scrollProgress, introProgress);
     rendererHandle.renderer.render(aetherScene.scene, cameraRig.camera);
     frameId = window.requestAnimationFrame(tick);
   };
@@ -124,5 +130,27 @@ if (!sceneHost || !isWebGLAvailable()) {
     }
   } catch {
     showFallback();
+  }
+}
+
+if (typewriterRoot) {
+  const typewriter = createTypewriter({
+    root: typewriterRoot,
+    characterDelayMs: 17,
+    lineDelayMs: 130,
+    reducedMotion: reduceMotionQuery.matches,
+    onProgress: (progress) => {
+      introProgress = progress;
+      document.documentElement.style.setProperty(
+        "--intro-progress",
+        progress.toFixed(3)
+      );
+    }
+  });
+
+  typewriter.start();
+
+  if (import.meta.hot) {
+    import.meta.hot.dispose(typewriter.stop);
   }
 }

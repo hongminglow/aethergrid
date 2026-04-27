@@ -18,7 +18,11 @@ import {
 
 export type NeonEffects = {
   group: Group;
-  update: (elapsed: number, scrollProgress: number) => void;
+  update: (
+    elapsed: number,
+    scrollProgress: number,
+    introProgress: number
+  ) => void;
   dispose: () => void;
 };
 
@@ -170,14 +174,21 @@ export const createEffects = (): NeonEffects => {
 
   return {
     group,
-    update: (elapsed, scrollProgress) => {
+    update: (elapsed, scrollProgress, introProgress) => {
+      const pulse = 0.92 + introProgress * 0.18 + Math.sin(elapsed * 1.4) * 0.025;
+
       portal.outer.rotation.z = elapsed * 0.32;
       portal.middle.rotation.z = -elapsed * 0.45;
       portal.inner.rotation.z = elapsed * 0.18;
       portal.core.rotation.x = elapsed * 0.54;
       portal.core.rotation.y = elapsed * 0.38;
+      portal.core.scale.setScalar(pulse);
+      portal.outer.scale.setScalar(0.96 + introProgress * 0.08);
+      portal.middle.scale.setScalar(1.04 - introProgress * 0.05);
       portal.group.position.y = 1.08 + Math.sin(elapsed * 0.82) * 0.12;
       portal.group.rotation.y = -0.45 + scrollProgress * 0.22;
+      portalLight.intensity = 18 + introProgress * 18;
+      accentLight.intensity = 9 + introProgress * 10;
 
       shards.group.rotation.y = elapsed * 0.08 + scrollProgress * 1.2;
       shards.group.rotation.x = Math.sin(elapsed * 0.2) * 0.08;

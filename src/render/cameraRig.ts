@@ -3,7 +3,12 @@ import { PerspectiveCamera, Vector2, Vector3 } from "three";
 export type CameraRig = {
   camera: PerspectiveCamera;
   resize: () => void;
-  update: (elapsed: number, pointer: Vector2, scrollProgress: number) => void;
+  update: (
+    elapsed: number,
+    pointer: Vector2,
+    scrollProgress: number,
+    introProgress: number
+  ) => void;
 };
 
 const basePosition = new Vector3(0, 1.65, 10.5);
@@ -23,14 +28,20 @@ export const createCameraRig = (): CameraRig => {
     camera.updateProjectionMatrix();
   };
 
-  const update = (elapsed: number, pointer: Vector2, scrollProgress: number) => {
+  const update = (
+    elapsed: number,
+    pointer: Vector2,
+    scrollProgress: number,
+    introProgress: number
+  ) => {
     const scrollDrift = scrollProgress * 2.6;
     const breathing = Math.sin(elapsed * 0.42) * 0.1;
+    const revealPush = (1 - introProgress) * 0.86;
 
     nextPosition.set(
       basePosition.x + pointer.x * 0.58,
       basePosition.y + pointer.y * 0.32 + breathing,
-      basePosition.z - scrollDrift
+      basePosition.z + revealPush - scrollDrift
     );
 
     camera.position.lerp(nextPosition, 0.055);

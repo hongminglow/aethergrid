@@ -14,7 +14,12 @@ const escapeHtml = (value: string) =>
   });
 
 const renderIntroLines = (lines: readonly string[]) =>
-  lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+  lines
+    .map(
+      (line, index) =>
+        `<p data-typewriter-line data-typewriter-text="${escapeHtml(line)}" style="--line-index: ${index}">${escapeHtml(line)}</p>`
+    )
+    .join("");
 
 const renderExperienceEntries = (experiences: PortfolioData["experiences"]) =>
   experiences
@@ -63,10 +68,18 @@ export const createPortfolioMarkup = (data: PortfolioData) => {
     </p>
     <main class="portfolio-shell">
       <section class="hero-section page-section" aria-labelledby="intro-title">
-        <p class="eyebrow">Aethergrid foundation</p>
+        <div class="hero-orbital" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p class="eyebrow hero-eyebrow">Aethergrid identity uplink</p>
         <h1 id="intro-title">${escapeHtml(data.name)}</h1>
         <p class="title">${escapeHtml(data.title)}</p>
-        <div class="intro-lines">${introLines}</div>
+        <div class="intro-panel">
+          <span class="intro-panel__label">initializing profile stream</span>
+          <div class="intro-lines" data-typewriter-root>${introLines}</div>
+        </div>
         <nav class="contact-links contact-links--inline" aria-label="Primary contact links">
           ${contactLinks}
         </nav>

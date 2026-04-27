@@ -11,7 +11,11 @@ import { createParticles } from "./particles";
 
 export type AetherScene = {
   scene: Scene;
-  update: (elapsed: number, scrollProgress: number) => void;
+  update: (
+    elapsed: number,
+    scrollProgress: number,
+    introProgress: number
+  ) => void;
   dispose: () => void;
 };
 
@@ -33,11 +37,11 @@ export const createScene = (): AetherScene => {
 
   return {
     scene,
-    update: (elapsed, scrollProgress) => {
+    update: (elapsed, scrollProgress, introProgress) => {
       root.rotation.y = Math.sin(elapsed * 0.08) * 0.035;
       root.position.y = Math.sin(elapsed * 0.22) * 0.06;
       particles.update(elapsed, scrollProgress);
-      effects.update(elapsed, scrollProgress);
+      effects.update(elapsed, scrollProgress, introProgress);
     },
     dispose: () => {
       particles.dispose();
