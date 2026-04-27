@@ -49,7 +49,7 @@ const renderSkills = (skills: PortfolioData["skills"]) =>
   skills
     .map(
       (skill, index) =>
-        `<li class="skill-chip" data-skill-index="${index + 1}">${escapeHtml(skill)}</li>`
+        `<li class="skill-chip" data-skill-chip data-skill-index="${index + 1}" style="--skill-index: ${index}; --skill-count: ${skills.length}">${escapeHtml(skill)}</li>`
     )
     .join("");
 
@@ -99,14 +99,18 @@ export const createPortfolioMarkup = (data: PortfolioData) => {
         </div>
       </section>
 
-      <section class="skills-section page-section" aria-labelledby="skills-title">
-        <div class="section-heading">
+      <section class="skills-section page-section" aria-labelledby="skills-title" data-skills-section>
+        <div class="section-heading" data-skills-heading>
           <p class="eyebrow">Skill matrix</p>
           <h2 id="skills-title">Core Capabilities</h2>
         </div>
-        <ul class="skill-grid" aria-label="Skills">
-          ${renderSkills(data.skills)}
-        </ul>
+        <div class="skills-stage" data-skills-stage>
+          <span class="skills-stage__ring" aria-hidden="true"></span>
+          <span class="skills-stage__core" aria-hidden="true"></span>
+          <ul class="skill-grid" aria-label="Skills">
+            ${renderSkills(data.skills)}
+          </ul>
+        </div>
       </section>
 
       <section class="contact-section page-section" aria-labelledby="contact-title">

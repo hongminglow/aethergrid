@@ -61,11 +61,11 @@ Use this checklist to track implementation by batch. Each batch should be comple
 
 ## Batch 6 - Scroll-Triggered Skills Sequence
 
-- [ ] Build flexible skills layout for 10 to 20+ items.
-- [ ] Animate skills into view one by one.
-- [ ] Use a visual metaphor such as holographic chips, constellation nodes, orbiting tags, or magic-tech circle.
-- [ ] Prevent skill text from overlapping on small screens.
-- [ ] Ensure skill animation still works after changing the skills array length.
+- [x] Build flexible skills layout for 10 to 20+ items.
+- [x] Animate skills into view one by one.
+- [x] Use a visual metaphor such as holographic chips, constellation nodes, orbiting tags, or magic-tech circle.
+- [x] Prevent skill text from overlapping on small screens.
+- [x] Ensure skill animation still works after changing the skills array length.
 
 ## Batch 7 - Contact / Reach-Out Section
 

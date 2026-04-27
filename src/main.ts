@@ -24,6 +24,7 @@ const typewriterRoot = document.querySelector<HTMLElement>(
 const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 let introProgress = reduceMotionQuery.matches ? 1 : 0;
 let experienceProgress = 0;
+let skillsProgress = 0;
 
 const showFallback = () => {
   if (fallback) {
@@ -77,14 +78,16 @@ const startAetherScene = (host: HTMLElement) => {
       elapsed,
       scrollProgress,
       introProgress,
-      experienceProgress
+      experienceProgress,
+      skillsProgress
     );
     cameraRig.update(
       elapsed,
       pointer,
       scrollProgress,
       introProgress,
-      experienceProgress
+      experienceProgress,
+      skillsProgress
     );
     rendererHandle.renderer.render(aetherScene.scene, cameraRig.camera);
     frameId = window.requestAnimationFrame(tick);
@@ -172,6 +175,9 @@ const scrollTimeline = createScrollTimeline({
   reducedMotion: reduceMotionQuery.matches,
   onExperienceProgress: (progress) => {
     experienceProgress = progress;
+  },
+  onSkillsProgress: (progress) => {
+    skillsProgress = progress;
   }
 });
 

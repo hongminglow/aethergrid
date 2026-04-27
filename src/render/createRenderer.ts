@@ -19,7 +19,7 @@ const createWebGLRenderer = (antialias: boolean) =>
   new WebGLRenderer({
     alpha: true,
     antialias,
-    preserveDrawingBuffer: import.meta.env.DEV,
+    preserveDrawingBuffer: false,
     powerPreference: "default"
   });
 

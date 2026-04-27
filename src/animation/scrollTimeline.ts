@@ -8,6 +8,7 @@ export type ScrollTimelineHandle = {
 export type ScrollTimelineOptions = {
   reducedMotion?: boolean;
   onExperienceProgress?: (progress: number) => void;
+  onSkillsProgress?: (progress: number) => void;
   onActiveExperienceChange?: (index: number) => void;
 };
 
@@ -15,7 +16,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const clamp01 = (value: number) => Math.min(Math.max(value, 0), 1);
 
-const getExperienceProgress = (section: HTMLElement) => {
+const getSectionProgress = (section: HTMLElement) => {
   const rect = section.getBoundingClientRect();
   const travel = window.innerHeight + rect.height;
 
@@ -40,6 +41,7 @@ const setActiveEntry = (
 export const createScrollTimeline = ({
   reducedMotion = false,
   onExperienceProgress,
+  onSkillsProgress,
   onActiveExperienceChange
 }: ScrollTimelineOptions = {}): ScrollTimelineHandle => {
   const section = document.querySelector<HTMLElement>("[data-experience-section]");
@@ -54,6 +56,14 @@ export const createScrollTimeline = ({
     document.querySelectorAll<HTMLElement>(
       ".hero-eyebrow, #intro-title, .title, .intro-panel, .contact-links--inline"
     )
+  );
+  const skillsSection =
+    document.querySelector<HTMLElement>("[data-skills-section]");
+  const skillsHeading =
+    document.querySelector<HTMLElement>("[data-skills-heading]");
+  const skillsStage = document.querySelector<HTMLElement>("[data-skills-stage]");
+  const skillChips = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-skill-chip]")
   );
   const triggers: ScrollTrigger[] = [];
   let lastActiveIndex = -1;
@@ -81,14 +91,35 @@ export const createScrollTimeline = ({
     }
   };
 
+  const updateSkillsProgress = (progress: number) => {
+    const boundedProgress = clamp01(progress);
+
+    document.documentElement.style.setProperty(
+      "--skills-progress",
+      boundedProgress.toFixed(3)
+    );
+    onSkillsProgress?.(boundedProgress);
+  };
+
   if (reducedMotion) {
-    gsap.set([heading, entries, bullets], {
+    gsap.set([heading, entries, bullets, skillsHeading, skillsStage, skillChips], {
       clearProps: "all",
       opacity: 1
     });
-    updateProgress(getExperienceProgress(section));
+    skillChips.forEach((chip) => chip.classList.add("is-visible"));
+    updateProgress(getSectionProgress(section));
 
-    const onScroll = () => updateProgress(getExperienceProgress(section));
+    if (skillsSection) {
+      updateSkillsProgress(getSectionProgress(skillsSection));
+    }
+
+    const onScroll = () => {
+      updateProgress(getSectionProgress(section));
+
+      if (skillsSection) {
+        updateSkillsProgress(getSectionProgress(skillsSection));
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return {
@@ -99,6 +130,17 @@ export const createScrollTimeline = ({
   gsap.set(heading, { autoAlpha: 0, y: 36 });
   gsap.set(entries, { autoAlpha: 0, y: 72, rotateX: -8 });
   gsap.set(bullets, { autoAlpha: 0, x: -18 });
+
+  if (skillsHeading && skillsStage && skillChips.length > 0) {
+    gsap.set(skillsHeading, { autoAlpha: 0, y: 36 });
+    gsap.set(skillsStage, { autoAlpha: 0, scale: 0.96, y: 44 });
+    gsap.set(skillChips, {
+      autoAlpha: 0,
+      rotation: -6,
+      scale: 0.72,
+      y: 34
+    });
+  }
 
   const heroTrigger = ScrollTrigger.create({
     animation: gsap.to(heroTargets, {
@@ -173,12 +215,81 @@ export const createScrollTimeline = ({
     }
   });
 
+  if (skillsSection && skillsHeading && skillsStage && skillChips.length > 0) {
+    const skillProgressTrigger = ScrollTrigger.create({
+      end: "bottom top",
+      onUpdate: (self) => updateSkillsProgress(self.progress),
+      start: "top bottom",
+      trigger: skillsSection
+    });
+    triggers.push(skillProgressTrigger);
+
+    const skillTimeline = gsap.timeline({
+      scrollTrigger: {
+        end: "bottom 34%",
+        scrub: 0.7,
+        start: "top 74%",
+        trigger: skillsSection
+      }
+    });
+
+    skillTimeline
+      .to(skillsHeading, {
+        autoAlpha: 1,
+        duration: 0.18,
+        ease: "power3.out",
+        y: 0
+      })
+      .to(
+        skillsStage,
+        {
+          autoAlpha: 1,
+          duration: 0.22,
+          ease: "power3.out",
+          scale: 1,
+          y: 0
+        },
+        "<"
+      )
+      .to(
+        skillChips,
+        {
+          autoAlpha: 1,
+          duration: 0.72,
+          ease: "back.out(1.45)",
+          rotation: 0,
+          scale: 1,
+          stagger: {
+            amount: 0.8,
+            from: "center"
+          },
+          y: 0,
+          onStart: () => {
+            skillChips.forEach((chip) => chip.classList.add("is-visible"));
+          }
+        },
+        "+=0.08"
+      );
+
+    if (skillTimeline.scrollTrigger) {
+      triggers.push(skillTimeline.scrollTrigger);
+    }
+  }
+
   ScrollTrigger.refresh();
 
   return {
     destroy: () => {
       triggers.forEach((trigger) => trigger.kill());
-      gsap.killTweensOf([heading, entries, bullets, heroTargets]);
+      gsap.killTweensOf([
+        heading,
+        entries,
+        bullets,
+        heroTargets,
+        skillsHeading,
+        skillsStage,
+        skillChips
+      ]);
     }
   };
 };

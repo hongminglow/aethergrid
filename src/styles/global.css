@@ -1,6 +1,7 @@
 :root {
   --intro-progress: 0;
   --experience-progress: 0;
+  --skills-progress: 0;
   color: #f5fbff;
   background: #05070d;
   font-family:
@@ -363,27 +364,143 @@ h3 {
   will-change: opacity, transform;
 }
 
-.skill-grid {
+.skills-section {
+  width: min(1080px, 100%);
+}
+
+.skills-stage {
+  position: relative;
+  min-height: 520px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
-  gap: 12px;
+  align-items: center;
+  padding: clamp(30px, 6vw, 72px);
+  overflow: hidden;
+  border: 1px solid rgb(112 246 255 / 20%);
+  background:
+    radial-gradient(circle at 50% 50%, rgb(112 246 255 / 12%), transparent 24%),
+    radial-gradient(circle at 20% 80%, rgb(130 255 114 / 9%), transparent 22%),
+    linear-gradient(135deg, rgb(5 7 13 / 46%), rgb(16 8 25 / 54%));
+  box-shadow:
+    inset 0 0 70px rgb(112 246 255 / 7%),
+    0 28px 90px rgb(0 0 0 / 30%);
+}
+
+.skills-stage::before,
+.skills-stage::after,
+.skills-stage__ring {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  width: min(620px, 84vw);
+  aspect-ratio: 1;
+  border: 1px solid rgb(112 246 255 / 16%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(calc(var(--skills-progress) * 55deg));
+  pointer-events: none;
+}
+
+.skills-stage::after {
+  width: min(420px, 66vw);
+  border-color: rgb(255 72 196 / 18%);
+  transform: translate(-50%, -50%) rotate(calc(var(--skills-progress) * -72deg));
+}
+
+.skills-stage__ring {
+  width: min(260px, 48vw);
+  border-color: rgb(130 255 114 / 18%);
+  box-shadow: 0 0 60px rgb(130 255 114 / 8%);
+}
+
+.skills-stage__core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(70px, 12vw, 130px);
+  aspect-ratio: 1;
+  border: 1px solid rgb(112 246 255 / 28%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgb(112 246 255 / 26%), transparent 62%),
+    radial-gradient(circle at 65% 35%, rgb(255 72 196 / 22%), transparent 44%);
+  box-shadow:
+    0 0 42px rgb(112 246 255 / 22%),
+    inset 0 0 30px rgb(255 72 196 / 12%);
+  opacity: calc(0.46 + var(--skills-progress) * 0.38);
+  transform: translate(-50%, -50%) scale(calc(0.85 + var(--skills-progress) * 0.2));
+  pointer-events: none;
+}
+
+.skill-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 14px;
   padding: 0;
   margin: 0;
   list-style: none;
 }
 
 .skill-chip {
-  min-height: 52px;
+  position: relative;
+  min-height: 54px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 12px 14px;
+  overflow: hidden;
   border: 1px solid rgb(255 72 196 / 28%);
   background:
     radial-gradient(circle at top left, rgb(255 72 196 / 16%), transparent 45%),
-    rgb(8 14 28 / 64%);
+    linear-gradient(135deg, rgb(112 246 255 / 9%), transparent 58%),
+    rgb(8 14 28 / 70%);
   color: rgb(245 251 255 / 88%);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: clamp(0.82rem, 1.4vw, 0.98rem);
+  line-height: 1.25;
   text-align: center;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  box-shadow: 0 0 0 rgb(112 246 255 / 0%);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+  will-change: opacity, transform;
+}
+
+.skill-chip::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 5px;
+  aspect-ratio: 1;
+  background: #82ff72;
+  box-shadow: 0 0 18px rgb(130 255 114 / 82%);
+  opacity: 0.72;
+}
+
+.skill-chip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgb(112 246 255 / 18%), transparent);
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: transform 420ms ease, opacity 180ms ease;
+}
+
+.skill-chip.is-visible {
+  border-color: rgb(112 246 255 / 44%);
+  box-shadow:
+    0 0 0 1px rgb(112 246 255 / 9%),
+    0 18px 42px rgb(0 0 0 / 24%);
+}
+
+.skill-chip.is-visible::after {
+  opacity: 1;
+  transform: translateX(100%);
 }
 
 .contact-links {
@@ -456,6 +573,28 @@ h3 {
     flex-direction: column;
     gap: 8px;
   }
+
+  .skills-stage {
+    min-height: auto;
+    padding: 22px;
+  }
+
+  .skills-stage::before,
+  .skills-stage::after,
+  .skills-stage__ring,
+  .skills-stage__core {
+    opacity: 0.46;
+  }
+
+  .skill-grid {
+    grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+    gap: 10px;
+  }
+
+  .skill-chip {
+    min-height: 50px;
+    padding: 10px 12px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -465,8 +604,16 @@ h3 {
   }
 
   .experience-entry,
-  .experience-entry li {
+  .experience-entry li,
+  .skill-chip {
     transition: none;
     will-change: auto;
+  }
+
+  .skills-stage::before,
+  .skills-stage::after,
+  .skills-stage__ring,
+  .skills-stage__core {
+    transform: translate(-50%, -50%);
   }
 }

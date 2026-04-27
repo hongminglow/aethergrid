@@ -8,7 +8,8 @@ export type CameraRig = {
     pointer: Vector2,
     scrollProgress: number,
     introProgress: number,
-    experienceProgress: number
+    experienceProgress: number,
+    skillsProgress: number
   ) => void;
 };
 
@@ -34,23 +35,24 @@ export const createCameraRig = (): CameraRig => {
     pointer: Vector2,
     scrollProgress: number,
     introProgress: number,
-    experienceProgress: number
+    experienceProgress: number,
+    skillsProgress: number
   ) => {
     const scrollDrift = scrollProgress * 2.6;
     const breathing = Math.sin(elapsed * 0.42) * 0.1;
     const revealPush = (1 - introProgress) * 0.86;
-    const archiveLean = experienceProgress * 0.42;
+    const archiveLean = experienceProgress * 0.42 - skillsProgress * 0.24;
 
     nextPosition.set(
       basePosition.x + pointer.x * 0.58 - archiveLean,
-      basePosition.y + pointer.y * 0.32 + breathing,
+      basePosition.y + pointer.y * 0.32 + breathing + skillsProgress * 0.18,
       basePosition.z + revealPush - scrollDrift
     );
 
     camera.position.lerp(nextPosition, 0.055);
     camera.lookAt(
       lookTarget.x + pointer.x * 0.24 - experienceProgress * 0.25,
-      lookTarget.y + pointer.y * 0.12,
+      lookTarget.y + pointer.y * 0.12 + skillsProgress * 0.18,
       lookTarget.z - scrollProgress * 2
     );
   };
