@@ -7,7 +7,7 @@ const escapeHtml = (value: string) =>
       "<": "&lt;",
       ">": "&gt;",
       '"': "&quot;",
-      "'": "&#39;"
+      "'": "&#39;",
     };
 
     return entities[character];
@@ -21,7 +21,7 @@ const getSkillMeta = (skill: string, index: number) => {
     { rotate: "8deg", x: "98px", y: "156px" },
     { rotate: "14deg", x: "226px", y: "96px" },
     { rotate: "-11deg", x: "-172px", y: "-92px" },
-    { rotate: "11deg", x: "172px", y: "-92px" }
+    { rotate: "11deg", x: "172px", y: "-92px" },
   ];
   const icon = clean
     .split(/\s+/)
@@ -43,7 +43,7 @@ const renderTypewriterLines = (lines: readonly string[]) =>
           <span data-typewriter-text aria-hidden="true"></span>
           <span class="sr-only">${escapeHtml(line)}</span>
         </p>
-      `
+      `,
     )
     .join("");
 
@@ -91,10 +91,10 @@ const renderExperienceEntries = (experiences: PortfolioData["experiences"]) =>
     .join("");
 
 const renderContactLinks = (data: PortfolioData["contact"]) => `
-  <a class="contact-link" href="mailto:${escapeHtml(data.email)}">
+  <button class="contact-link contact-link--button" type="button" data-copy-email="${escapeHtml(data.email)}">
     <span>email_</span>
     <strong>${escapeHtml(data.email)}</strong>
-  </a>
+  </button>
   <a class="contact-link" href="${escapeHtml(data.githubUrl)}" target="_blank" rel="noreferrer">
     <span>github_</span>
     <strong>GitHub</strong>
@@ -119,6 +119,9 @@ export const createPortfolioMarkup = (data: PortfolioData) => `
   <div class="reading-progress" aria-hidden="true">
     <span data-reading-progress></span>
   </div>
+  <div class="signal-toast" data-signal-toast role="status" aria-live="polite" aria-atomic="true">
+    <span>email copied_to_clipboard_</span>
+  </div>
   <a class="skip-link" href="#content">skip_to_content_</a>
   <div id="scene-host" class="scene-host" aria-hidden="true"></div>
   <p id="webgl-fallback" class="webgl-fallback" role="status" hidden>
@@ -128,7 +131,7 @@ export const createPortfolioMarkup = (data: PortfolioData) => `
     <section class="hero-section" aria-labelledby="intro-title">
       <div class="hero-copy">
         <p class="eyebrow">cyber_core_</p>
-        <h1 id="intro-title">${escapeHtml(data.name)}</h1>
+        <h1 id="intro-title">${escapeHtml(data.name.toUpperCase())}</h1>
         <p class="hero-title">${escapeHtml(data.title)}</p>
         <div class="hero-actions">
           <a href="#identity">read_signal_</a>

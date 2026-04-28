@@ -88,12 +88,3 @@ Preview the production build:
 ```sh
 npm run preview
 ```
-
-## Project Documents
-
-- `fantasy-cyberpunk-portfolio-spec.md` contains the full product and implementation spec.
-- `project-requirements-checklist.md` contains the batch-by-batch implementation checklist.
-
-## Current Status
-
-Patch-notes redraft is complete. The current version contains an interactive Three.js Cyber Core hero, 4000-particle field, floating node network, loading screen, custom cursor, scroll-revealed skill cards with proficiency bars, center-line work experience timeline, three mini Three.js showcase canvases, responsive layout hardening, and build verification.

@@ -25,6 +25,10 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
   );
   const cursorDot = document.querySelector<HTMLElement>("[data-cursor-dot]");
   const cursorRing = document.querySelector<HTMLElement>("[data-cursor-ring]");
+  const signalToast = document.querySelector<HTMLElement>("[data-signal-toast]");
+  const emailCopyButton = document.querySelector<HTMLButtonElement>(
+    "[data-copy-email]"
+  );
   const skillCards = Array.from(
     document.querySelectorAll<HTMLElement>("[data-skill-card]")
   );
@@ -64,6 +68,7 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
   let ringX = targetX;
   let ringY = targetY;
   let scrollFrame = 0;
+  let toastTimeout = 0;
 
   const hideLoading = () => {
     loadingScreen?.classList.add("is-hidden");
@@ -87,6 +92,48 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
       });
     } catch {
       // Ignore malformed hash values.
+    }
+  };
+
+  const showSignalToast = (message: string) => {
+    if (!signalToast) {
+      return;
+    }
+
+    signalToast.textContent = message;
+    signalToast.classList.add("is-visible");
+    window.clearTimeout(toastTimeout);
+    toastTimeout = window.setTimeout(() => {
+      signalToast.classList.remove("is-visible");
+    }, 2100);
+  };
+
+  const copyTextToClipboard = async (text: string) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return;
+      } catch {
+        // Fall through to the selection-based copy path.
+      }
+    }
+
+    const input = document.createElement("textarea");
+
+    input.value = text;
+    input.setAttribute("readonly", "");
+    input.style.position = "fixed";
+    input.style.left = "-9999px";
+    input.style.top = "0";
+    document.body.append(input);
+    input.select();
+
+    const copied = document.execCommand("copy");
+
+    input.remove();
+
+    if (!copied) {
+      throw new Error("Clipboard copy failed");
     }
   };
 
@@ -274,9 +321,29 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
     window.removeEventListener("scroll", scheduleScrollUpdate);
     window.removeEventListener("resize", scheduleScrollUpdate);
     window.cancelAnimationFrame(scrollFrame);
+    window.clearTimeout(toastTimeout);
   });
   updateScrollState();
   scrollToInitialHash();
+
+  if (emailCopyButton) {
+    const copyEmail = () => {
+      const email = emailCopyButton.dataset.copyEmail;
+
+      if (!email) {
+        return;
+      }
+
+      copyTextToClipboard(email)
+        .then(() => showSignalToast("email copied_to_clipboard_"))
+        .catch(() => showSignalToast("copy blocked_manual_copy_email_"));
+    };
+
+    emailCopyButton.addEventListener("click", copyEmail);
+    cleanup.push(() => {
+      emailCopyButton.removeEventListener("click", copyEmail);
+    });
+  }
 
   if (typewriterSection && typewriterLines.length > 0) {
     const lineModels = typewriterLines.map((line) => ({

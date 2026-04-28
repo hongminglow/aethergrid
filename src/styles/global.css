@@ -161,6 +161,42 @@ canvas {
   transform-origin: 0 50%;
 }
 
+.signal-toast {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 80;
+  max-width: min(360px, calc(100vw - 36px));
+  padding: 13px 16px;
+  border: 1px solid var(--border-hot);
+  background:
+    linear-gradient(135deg, rgb(0 255 255 / 16%), transparent 46%),
+    linear-gradient(315deg, rgb(255 0 170 / 16%), transparent 48%),
+    rgb(5 5 16 / 92%);
+  box-shadow:
+    0 0 0 1px rgb(255 0 170 / 12%),
+    0 0 34px rgb(0 255 255 / 22%);
+  color: #ffffff;
+  font-size: 0.82rem;
+  pointer-events: none;
+  text-transform: lowercase;
+  transform: translate3d(0, 18px, 0);
+  opacity: 0;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.signal-toast::before {
+  color: var(--cyan);
+  content: "signal_ ";
+}
+
+.signal-toast.is-visible {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+
 .loading-screen {
   position: fixed;
   inset: 0;
@@ -907,6 +943,12 @@ h3 {
   justify-content: flex-end;
   gap: 10px;
   padding: 18px;
+}
+
+.contact-link--button {
+  width: 100%;
+  font: inherit;
+  text-align: left;
 }
 
 .contact-link span {

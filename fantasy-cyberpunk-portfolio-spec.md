@@ -74,16 +74,17 @@ export const portfolioData = {
     "Line one of short self introduction.",
     "Line two of short self introduction.",
     "Line three of short self introduction.",
-    "Optional fourth line."
+    "Optional fourth line.",
   ],
   contact: {
     email: "your.email@example.com",
     githubUrl: "https://github.com/your-username",
-    linkedInUrl: "https://www.linkedin.com/in/your-profile"
+    linkedInUrl: "https://www.linkedin.com/in/your-profile",
   },
   experienceSummary: {
     totalYears: "3+ years",
-    headline: "Building scalable web applications and immersive digital products."
+    headline:
+      "Building scalable web applications and immersive digital products.",
   },
   experiences: [
     {
@@ -93,9 +94,9 @@ export const portfolioData = {
       description: [
         "Built responsive and performant application interfaces.",
         "Integrated APIs and improved user workflows.",
-        "Collaborated with designers and backend engineers."
-      ]
-    }
+        "Collaborated with designers and backend engineers.",
+      ],
+    },
   ],
   skills: [
     "TypeScript",
@@ -105,8 +106,8 @@ export const portfolioData = {
     "PostgreSQL",
     "REST APIs",
     "Git",
-    "UI Engineering"
-  ]
+    "UI Engineering",
+  ],
 } as const;
 ```
 
@@ -365,13 +366,3 @@ Check:
 
 List any issues by severity and fix all blocking issues before delivery.
 ```
-
-## Open Questions for Next Requirement Pass
-
-- What exact name, title, and intro copy should be used?
-- How many experience entries should appear in the first version?
-- Should the portfolio include projects or resume download?
-- Should the page be one continuous scroll or include navigation anchors?
-- Should the visual mood lean more fantasy, more cyberpunk, or exactly balanced?
-- Should there be background music or sound effects, or should it stay silent?
-- Should the project use React, or should it remain vanilla TypeScript as currently specified?
