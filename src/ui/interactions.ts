@@ -55,6 +55,7 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
     (window as Window & { webkitAudioContext?: typeof AudioContext })
       .webkitAudioContext;
   let typingAudioContext: AudioContext | null = null;
+  let keyNoiseBuffer: AudioBuffer | null = null;
   let typingAudioUnlocked = false;
   let lastTypingSoundAt = 0;
   let cursorFrame = 0;
@@ -116,6 +117,29 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
       });
   };
 
+  const getKeyNoiseBuffer = (context: AudioContext) => {
+    if (keyNoiseBuffer) {
+      return keyNoiseBuffer;
+    }
+
+    const duration = 0.052;
+    const sampleCount = Math.floor(context.sampleRate * duration);
+    const buffer = context.createBuffer(1, sampleCount, context.sampleRate);
+    const channel = buffer.getChannelData(0);
+
+    for (let index = 0; index < sampleCount; index += 1) {
+      const progress = index / sampleCount;
+      const envelope = Math.pow(1 - progress, 3.8);
+      const transient = index < sampleCount * 0.18 ? 1 : 0.38;
+
+      channel[index] = (Math.random() * 2 - 1) * envelope * transient;
+    }
+
+    keyNoiseBuffer = buffer;
+
+    return buffer;
+  };
+
   const playTypingSound = (direction: number) => {
     const context = getTypingAudioContext();
 
@@ -144,24 +168,47 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
 
     lastTypingSoundAt = now;
 
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    const baseFrequency = direction >= 0 ? 1120 : 760;
-    const frequencyDrift = Math.random() * 220;
+    const clickSource = context.createBufferSource();
+    const clickFilter = context.createBiquadFilter();
+    const clickGain = context.createGain();
+    const keyBottom = context.createOscillator();
+    const keyBottomGain = context.createGain();
 
-    oscillator.type = "triangle";
-    oscillator.frequency.setValueAtTime(baseFrequency + frequencyDrift, now);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.028, now + 0.006);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.046);
+    clickSource.buffer = getKeyNoiseBuffer(context);
+    clickSource.playbackRate.value = 0.92 + Math.random() * 0.18;
+    clickFilter.type = "bandpass";
+    clickFilter.frequency.setValueAtTime(2500 + Math.random() * 900, now);
+    clickFilter.Q.setValueAtTime(7.5, now);
+    clickGain.gain.setValueAtTime(0.0001, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.052, now + 0.003);
+    clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.044);
 
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start(now);
-    oscillator.stop(now + 0.052);
-    oscillator.addEventListener("ended", () => {
-      oscillator.disconnect();
-      gain.disconnect();
+    keyBottom.type = "sine";
+    keyBottom.frequency.setValueAtTime(
+      (direction >= 0 ? 155 : 120) + Math.random() * 45,
+      now
+    );
+    keyBottomGain.gain.setValueAtTime(0.0001, now);
+    keyBottomGain.gain.exponentialRampToValueAtTime(0.012, now + 0.004);
+    keyBottomGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.032);
+
+    clickSource.connect(clickFilter);
+    clickFilter.connect(clickGain);
+    clickGain.connect(context.destination);
+    keyBottom.connect(keyBottomGain);
+    keyBottomGain.connect(context.destination);
+    clickSource.start(now);
+    keyBottom.start(now);
+    clickSource.stop(now + 0.06);
+    keyBottom.stop(now + 0.038);
+    clickSource.addEventListener("ended", () => {
+      clickSource.disconnect();
+      clickFilter.disconnect();
+      clickGain.disconnect();
+    });
+    keyBottom.addEventListener("ended", () => {
+      keyBottom.disconnect();
+      keyBottomGain.disconnect();
     });
   };
 
@@ -315,6 +362,7 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
       onRefresh: (self) => renderTypewriterProgress(self.progress),
       onUpdate: (self) => renderTypewriterProgress(self.progress),
       pin: true,
+      pinType: "fixed",
       start: "top top",
       trigger: typewriterSection
     });
