@@ -131,7 +131,7 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
     const timeline = gsap.timeline({
       defaults: { ease: "expo.out" },
       scrollTrigger: {
-        end: "bottom 30%",
+        end: "center 58%",
         invalidateOnRefresh: true,
         scrub: 0.9,
         start: "top 96%",
