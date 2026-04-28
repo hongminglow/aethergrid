@@ -1,9 +1,14 @@
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 export type PortfolioInteractions = {
   destroy: () => void;
   hideLoading: () => void;
 };
 
 const clamp01 = (value: number) => Math.min(Math.max(value, 0), 1);
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const createPortfolioInteractions = (): PortfolioInteractions => {
   const loadingScreen = document.querySelector<HTMLElement>(
@@ -23,6 +28,8 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
   const skillCards = Array.from(
     document.querySelectorAll<HTMLElement>("[data-skill-card]")
   );
+  const skillsSection = document.querySelector<HTMLElement>("#skills");
+  const skillsGrid = document.querySelector<HTMLElement>(".skills-grid");
   const experienceCards = Array.from(
     document.querySelectorAll<HTMLElement>("[data-experience-card]")
   );
@@ -46,6 +53,27 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
 
   const hideLoading = () => {
     loadingScreen?.classList.add("is-hidden");
+  };
+
+  const scrollToInitialHash = () => {
+    if (window.location.hash.length <= 1) {
+      return;
+    }
+
+    try {
+      const target = document.getElementById(
+        decodeURIComponent(window.location.hash.slice(1))
+      );
+
+      const scrollToTarget = () => target?.scrollIntoView({ block: "start" });
+
+      window.requestAnimationFrame(() => {
+        scrollToTarget();
+        window.setTimeout(scrollToTarget, 160);
+      });
+    } catch {
+      // Ignore malformed hash values.
+    }
   };
 
   const updateScrollState = () => {
@@ -88,6 +116,167 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
     window.cancelAnimationFrame(scrollFrame);
   });
   updateScrollState();
+  scrollToInitialHash();
+
+  if (skillCards.length > 0 && skillsSection && skillsGrid) {
+    const entryVectors = [
+      { rotation: -18, rotationX: 24, rotationY: -44, skewX: -8, x: -360, y: 148, z: -180 },
+      { rotation: -10, rotationX: -28, rotationY: -20, skewX: -5, x: -176, y: 280, z: -140 },
+      { rotation: 10, rotationX: -28, rotationY: 20, skewX: 5, x: 182, y: 280, z: -140 },
+      { rotation: 18, rotationX: 24, rotationY: 44, skewX: 8, x: 372, y: 148, z: -180 },
+      { rotation: -15, rotationX: 34, rotationY: -28, skewX: -6, x: -286, y: -188, z: -220 },
+      { rotation: 15, rotationX: 34, rotationY: 28, skewX: 6, x: 286, y: -188, z: -220 }
+    ];
+    const sequenceDuration = skillCards.length * 0.22 + 1.55;
+    const timeline = gsap.timeline({
+      defaults: { ease: "expo.out" },
+      scrollTrigger: {
+        end: "bottom 30%",
+        invalidateOnRefresh: true,
+        scrub: 0.9,
+        start: "top 96%",
+        trigger: skillsGrid
+      }
+    });
+
+    timeline.to(
+      skillsSection,
+      {
+        "--skills-scan": 1,
+        duration: sequenceDuration,
+        ease: "none"
+      },
+      0
+    );
+
+    skillCards.forEach((card, index) => {
+      const vector = entryVectors[index % entryVectors.length];
+      const bar = card.querySelector<HTMLElement>(".skill-card__bar span");
+      const barTrack = card.querySelector<HTMLElement>(".skill-card__bar");
+      const chrome = card.querySelector<HTMLElement>(".skill-card__chrome");
+      const name = card.querySelector<HTMLElement>(".skill-card__name");
+      const content = [chrome, name, barTrack].filter(
+        (item): item is HTMLElement => item !== null
+      );
+      const startAt = index * 0.22;
+      const proficiency =
+        card.style.getPropertyValue("--proficiency").trim() || "84%";
+
+      card.classList.add("is-scrolltrigger-card");
+      gsap.set(card, {
+        "--skill-grid": 0,
+        autoAlpha: 0,
+        "--skill-glow": 0,
+        "--skill-ignite": 0,
+        "--skill-sweep": 0,
+        "--skill-sweep-x": "-145%",
+        clipPath: "polygon(46% 0%, 54% 0%, 54% 100%, 46% 100%)",
+        filter: "blur(26px) brightness(1.9) saturate(1.65)",
+        force3D: true,
+        rotation: vector.rotation,
+        rotationX: vector.rotationX,
+        rotationY: vector.rotationY,
+        scale: 0.34,
+        skewX: vector.skewX,
+        transformPerspective: 1200,
+        transformOrigin: "50% 50%",
+        x: vector.x,
+        y: vector.y,
+        z: vector.z
+      });
+      gsap.set(content, { autoAlpha: 0, y: 18 });
+      gsap.set(bar, { width: "0%" });
+
+      timeline
+        .to(
+          card,
+          {
+            autoAlpha: 1,
+            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+            duration: 1.18,
+            filter: "blur(0px) brightness(1) saturate(1.08)",
+            onComplete: () => card.classList.add("is-visible"),
+            onReverseComplete: () => card.classList.remove("is-visible"),
+            rotation: 0,
+            rotationX: 0,
+            rotationY: 0,
+            scale: 1,
+            skewX: 0,
+            x: 0,
+            y: 0,
+            z: 0
+          },
+          startAt
+        )
+        .to(
+          card,
+          {
+            "--skill-grid": 0.86,
+            "--skill-glow": 1,
+            "--skill-ignite": 1,
+            duration: 0.3,
+            ease: "power2.out",
+          },
+          startAt + 0.12
+        )
+        .to(
+          card,
+          {
+            "--skill-sweep": 1,
+            "--skill-sweep-x": "136%",
+            duration: 0.62,
+            ease: "power2.inOut"
+          },
+          startAt + 0.2
+        )
+        .to(
+          content,
+          {
+            autoAlpha: 1,
+            duration: 0.44,
+            ease: "power3.out",
+            stagger: 0.07,
+            y: 0
+          },
+          startAt + 0.34
+        )
+        .to(
+          card,
+          {
+            "--skill-sweep": 0,
+            duration: 0.22,
+            ease: "power2.out"
+          },
+          startAt + 0.78
+        )
+        .to(
+          card,
+          {
+            "--skill-grid": 0.22,
+            "--skill-glow": 0.42,
+            "--skill-ignite": 0.34,
+            duration: 0.42,
+            ease: "power2.out"
+          },
+          startAt + 0.84
+        )
+        .to(
+          bar,
+          {
+            duration: 0.72,
+            ease: "power2.out",
+            width: proficiency
+          },
+          startAt + 0.64
+        );
+    });
+
+    cleanup.push(() => {
+      timeline.scrollTrigger?.kill();
+      timeline.kill();
+    });
+    window.requestAnimationFrame(() => ScrollTrigger.refresh());
+  }
 
   const revealObserver = new IntersectionObserver(
     (entries) => {
@@ -101,7 +290,7 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
     { threshold: 0.15 }
   );
 
-  [...skillCards, ...experienceCards, ...headings].forEach((element) => {
+  [...experienceCards, ...headings].forEach((element) => {
     if (prefersReducedMotion.matches) {
       element.classList.add("is-visible");
     } else {

@@ -15,6 +15,14 @@ const escapeHtml = (value: string) =>
 
 const getSkillMeta = (skill: string, index: number) => {
   const clean = skill.replace(/[^a-zA-Z0-9 ]/g, " ").trim();
+  const entryVectors = [
+    { rotate: "-14deg", x: "-220px", y: "96px" },
+    { rotate: "-8deg", x: "-92px", y: "156px" },
+    { rotate: "8deg", x: "98px", y: "156px" },
+    { rotate: "14deg", x: "226px", y: "96px" },
+    { rotate: "-11deg", x: "-172px", y: "-92px" },
+    { rotate: "11deg", x: "172px", y: "-92px" }
+  ];
   const icon = clean
     .split(/\s+/)
     .filter(Boolean)
@@ -22,8 +30,9 @@ const getSkillMeta = (skill: string, index: number) => {
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("");
   const proficiency = Math.max(68, 96 - (index % 8) * 4);
+  const entryVector = entryVectors[index % entryVectors.length];
 
-  return { icon: icon || "SK", proficiency };
+  return { entryVector, icon: icon || "SK", proficiency };
 };
 
 const renderIntroLines = (lines: readonly string[]) =>
@@ -34,13 +43,15 @@ const renderIntroLines = (lines: readonly string[]) =>
 const renderSkills = (skills: PortfolioData["skills"]) =>
   skills
     .map((skill, index) => {
-      const { icon, proficiency } = getSkillMeta(skill, index);
+      const { entryVector, icon, proficiency } = getSkillMeta(skill, index);
 
       return `
-        <li class="skill-card" data-skill-card style="--delay: ${index * 120}ms; --proficiency: ${proficiency}%;">
-          <span class="skill-card__icon">${escapeHtml(icon)}</span>
+        <li class="skill-card" data-skill-card style="--delay: ${index * 86}ms; --proficiency: ${proficiency}%; --start-x: ${entryVector.x}; --start-y: ${entryVector.y}; --start-rotate: ${entryVector.rotate};">
+          <span class="skill-card__chrome">
+            <span class="skill-card__icon">${escapeHtml(icon)}</span>
+            <span class="skill-card__index">skill_${String(index + 1).padStart(2, "0")}</span>
+          </span>
           <span class="skill-card__name">${escapeHtml(skill)}</span>
-          <span class="skill-card__meta">${proficiency}% sync</span>
           <span class="skill-card__bar" aria-hidden="true"><span></span></span>
         </li>
       `;
