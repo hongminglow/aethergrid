@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Aethergrid icon</title>
+  <desc id="desc">Neon A monogram inside a cyber grid core.</desc>
+  <defs>
+    <linearGradient id="core" x1="18" y1="18" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00ffff"/>
+      <stop offset="0.52" stop-color="#7c5cff"/>
+      <stop offset="1" stop-color="#ff00aa"/>
+    </linearGradient>
+    <radialGradient id="aura" cx="50%" cy="44%" r="58%">
+      <stop offset="0" stop-color="#00ffff" stop-opacity="0.42"/>
+      <stop offset="0.52" stop-color="#ff00aa" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#050510" stop-opacity="1"/>
+    </radialGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#050510"/>
+  <rect x="5" y="5" width="118" height="118" rx="24" fill="url(#aura)"/>
+  <path d="M64 12 109 38 109 90 64 116 19 90 19 38Z" fill="none" stroke="url(#core)" stroke-width="4" filter="url(#glow)"/>
+  <path d="M64 12V116M19 38H109M19 90H109M37 28 91 100M91 28 37 100" fill="none" stroke="#00ffff" stroke-opacity="0.2" stroke-width="2"/>
+  <path d="M35 96 58 31h12l23 65H79l-4-13H53l-4 13H35Zm22-25h14L64 49Z" fill="url(#core)" filter="url(#glow)"/>
+  <path d="M50 83h28" stroke="#ffffff" stroke-opacity="0.72" stroke-width="3" stroke-linecap="round"/>
+</svg>
