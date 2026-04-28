@@ -35,9 +35,16 @@ const getSkillMeta = (skill: string, index: number) => {
   return { entryVector, icon: icon || "SK", proficiency };
 };
 
-const renderIntroLines = (lines: readonly string[]) =>
+const renderTypewriterLines = (lines: readonly string[]) =>
   lines
-    .map((line) => `<p>${escapeHtml(line)}</p>`)
+    .map(
+      (line) => `
+        <p class="typewriter-line" data-typewriter-line data-text="${escapeHtml(line)}" aria-label="${escapeHtml(line)}">
+          <span data-typewriter-text aria-hidden="true"></span>
+          <span class="sr-only">${escapeHtml(line)}</span>
+        </p>
+      `
+    )
     .join("");
 
 const renderSkills = (skills: PortfolioData["skills"]) =>
@@ -123,16 +130,25 @@ export const createPortfolioMarkup = (data: PortfolioData) => `
         <p class="eyebrow">cyber_core_</p>
         <h1 id="intro-title">${escapeHtml(data.name)}</h1>
         <p class="hero-title">${escapeHtml(data.title)}</p>
-        <div class="hero-intro">${renderIntroLines(data.intro)}</div>
         <div class="hero-actions">
-          <a href="#work">view_webgl_work_</a>
+          <a href="#identity">read_signal_</a>
           <a href="#contact">contact_signal_</a>
         </div>
       </div>
       <div class="hero-status" aria-hidden="true">
-        <span>orbit controls enabled</span>
+        <span>manual orbit enabled</span>
         <span>drag to rotate core</span>
-        <span>4000 particle field</span>
+        <span>5200 particle field</span>
+      </div>
+    </section>
+
+    <section class="identity-section" id="identity" aria-labelledby="identity-title" data-typewriter-section>
+      <div class="identity-copy">
+        <p class="eyebrow">identity_signal_</p>
+        <h2 id="identity-title">introduction_</h2>
+        <div class="identity-typewriter" data-typewriter>
+          ${renderTypewriterLines(data.intro)}
+        </div>
       </div>
     </section>
 

@@ -30,6 +30,12 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
   );
   const skillsSection = document.querySelector<HTMLElement>("#skills");
   const skillsGrid = document.querySelector<HTMLElement>(".skills-grid");
+  const typewriterSection = document.querySelector<HTMLElement>(
+    "[data-typewriter-section]"
+  );
+  const typewriterLines = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-typewriter-line]")
+  );
   const experienceCards = Array.from(
     document.querySelectorAll<HTMLElement>("[data-experience-card]")
   );
@@ -44,6 +50,13 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
     "(prefers-reduced-motion: reduce)"
   );
   const pointerFine = window.matchMedia("(pointer: fine)");
+  const AudioContextClass =
+    window.AudioContext ??
+    (window as Window & { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext;
+  let typingAudioContext: AudioContext | null = null;
+  let typingAudioUnlocked = false;
+  let lastTypingSoundAt = 0;
   let cursorFrame = 0;
   let targetX = window.innerWidth / 2;
   let targetY = window.innerHeight / 2;
@@ -75,6 +88,106 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
       // Ignore malformed hash values.
     }
   };
+
+  const getTypingAudioContext = () => {
+    if (!AudioContextClass) {
+      return null;
+    }
+
+    typingAudioContext ??= new AudioContextClass();
+
+    return typingAudioContext;
+  };
+
+  const unlockTypingAudio = () => {
+    const context = getTypingAudioContext();
+
+    if (!context) {
+      return;
+    }
+
+    context
+      .resume()
+      .then(() => {
+        typingAudioUnlocked = context.state === "running";
+      })
+      .catch(() => {
+        typingAudioUnlocked = false;
+      });
+  };
+
+  const playTypingSound = (direction: number) => {
+    const context = getTypingAudioContext();
+
+    if (!context) {
+      return;
+    }
+
+    if (!typingAudioUnlocked || context.state !== "running") {
+      context
+        .resume()
+        .then(() => {
+          typingAudioUnlocked = context.state === "running";
+        })
+        .catch(() => {
+          typingAudioUnlocked = false;
+        });
+
+      return;
+    }
+
+    const now = context.currentTime;
+
+    if (now - lastTypingSoundAt < 0.032) {
+      return;
+    }
+
+    lastTypingSoundAt = now;
+
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const baseFrequency = direction >= 0 ? 1120 : 760;
+    const frequencyDrift = Math.random() * 220;
+
+    oscillator.type = "triangle";
+    oscillator.frequency.setValueAtTime(baseFrequency + frequencyDrift, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.028, now + 0.006);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.046);
+
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.052);
+    oscillator.addEventListener("ended", () => {
+      oscillator.disconnect();
+      gain.disconnect();
+    });
+  };
+
+  if (AudioContextClass) {
+    const unlockEvents: Array<keyof WindowEventMap> = [
+      "keydown",
+      "pointerdown",
+      "touchstart",
+      "wheel"
+    ];
+
+    unlockEvents.forEach((eventName) => {
+      window.addEventListener(eventName, unlockTypingAudio, {
+        once: true,
+        passive: true
+      });
+    });
+
+    cleanup.push(() => {
+      unlockEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, unlockTypingAudio);
+      });
+
+      typingAudioContext?.close().catch(() => undefined);
+    });
+  }
 
   const updateScrollState = () => {
     scrollFrame = 0;
@@ -117,6 +230,99 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
   });
   updateScrollState();
   scrollToInitialHash();
+
+  if (typewriterSection && typewriterLines.length > 0) {
+    const lineModels = typewriterLines.map((line) => ({
+      line,
+      target: line.querySelector<HTMLElement>("[data-typewriter-text]"),
+      text: line.dataset.text ?? ""
+    }));
+    const linePauseSteps = 10;
+    const totalSteps = lineModels.reduce(
+      (total, item, index) =>
+        total +
+        item.text.length +
+        (index < lineModels.length - 1 ? linePauseSteps : 0),
+      0
+    );
+    let previousTypedStep = -1;
+
+    const renderTypewriterProgress = (progress: number) => {
+      const typedStep = Math.floor(clamp01(progress) * totalSteps);
+      const previousStep = previousTypedStep;
+
+      if (typedStep === previousTypedStep) {
+        return;
+      }
+
+      previousTypedStep = typedStep;
+
+      let lineStartStep = 0;
+      let activeLineIndex = -1;
+
+      lineModels.forEach(({ line, target, text }, index) => {
+        const visibleCharacters = Math.min(
+          text.length,
+          Math.max(0, typedStep - lineStartStep)
+        );
+
+        lineStartStep +=
+          text.length + (index < lineModels.length - 1 ? linePauseSteps : 0);
+
+        if (target) {
+          target.textContent = text.slice(0, visibleCharacters);
+        }
+
+        line.classList.toggle(
+          "is-complete",
+          visibleCharacters === text.length && text.length > 0
+        );
+        line.classList.remove("is-typing");
+
+        if (
+          visibleCharacters > 0 &&
+          visibleCharacters < text.length &&
+          activeLineIndex === -1
+        ) {
+          activeLineIndex = index;
+        }
+      });
+
+      if (activeLineIndex >= 0) {
+        lineModels[activeLineIndex]?.line.classList.add("is-typing");
+      }
+
+      if (previousStep >= 0 && progress > 0 && progress < 1) {
+        playTypingSound(typedStep - previousStep);
+      }
+    };
+
+    lineModels.forEach(({ line, target }) => {
+      line.classList.remove("is-typing", "is-complete");
+
+      if (target) {
+        target.textContent = "";
+      }
+    });
+
+    renderTypewriterProgress(0);
+
+    const typewriterTrigger = ScrollTrigger.create({
+      anticipatePin: 1,
+      end: () =>
+        `+=${Math.max(window.innerHeight * 1.85, totalSteps * 16)}`,
+      invalidateOnRefresh: true,
+      onRefresh: (self) => renderTypewriterProgress(self.progress),
+      onUpdate: (self) => renderTypewriterProgress(self.progress),
+      pin: true,
+      start: "top top",
+      trigger: typewriterSection
+    });
+
+    cleanup.push(() => {
+      typewriterTrigger.kill();
+    });
+  }
 
   if (skillCards.length > 0 && skillsSection && skillsGrid) {
     const entryVectors = [

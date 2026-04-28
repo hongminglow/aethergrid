@@ -48,6 +48,18 @@ body {
   isolation: isolate;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 a {
   color: inherit;
 }
@@ -328,6 +340,58 @@ h3 {
 
 .hero-intro p {
   margin: 0;
+}
+
+.identity-section {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  overflow: clip;
+  padding: 96px 0;
+}
+
+.identity-copy {
+  position: relative;
+  z-index: 1;
+  width: min(900px, 100%);
+  padding: 0 0 0 min(8vw, 92px);
+}
+
+.identity-copy h2 {
+  margin-bottom: 34px;
+}
+
+.identity-typewriter {
+  display: grid;
+  gap: 18px;
+  max-width: 820px;
+}
+
+.typewriter-line {
+  min-height: 1.55em;
+  margin: 0;
+  color: rgb(245 251 255 / 88%);
+  font-size: clamp(1.15rem, 2.3vw, 2rem);
+  font-weight: 700;
+  line-height: 1.48;
+  text-shadow:
+    0 0 18px rgb(0 255 255 / 16%),
+    0 0 34px rgb(255 0 170 / 12%);
+}
+
+.typewriter-line [data-typewriter-text] {
+  display: inline;
+}
+
+.typewriter-line.is-typing::after {
+  display: inline-block;
+  width: 0.62em;
+  margin-left: 0.14em;
+  color: var(--cyan);
+  content: "_";
+  text-shadow: 0 0 18px rgb(0 255 255 / 64%);
+  animation: blink 0.72s steps(2, end) infinite;
 }
 
 .hero-actions {
@@ -867,6 +931,14 @@ h3 {
     margin-bottom: 0;
   }
 
+  .identity-section {
+    min-height: 100svh;
+  }
+
+  .identity-copy {
+    padding-left: 0;
+  }
+
   .timeline__line {
     left: 18px;
   }
@@ -915,6 +987,14 @@ h3 {
 
   .skills-grid {
     grid-template-columns: 1fr;
+  }
+
+  .identity-section {
+    padding: 76px 0;
+  }
+
+  .typewriter-line {
+    font-size: clamp(1.05rem, 6.2vw, 1.42rem);
   }
 
   .showcase-card__canvas {
