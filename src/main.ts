@@ -1,55 +1,21 @@
-import { Clock, Vector2 } from "three";
-import { createScrollTimeline } from "./animation/scrollTimeline";
-import type { ScrollTimelineHandle } from "./animation/scrollTimeline";
-import { createTypewriter } from "./animation/typewriter";
-import type { TypewriterHandle } from "./animation/typewriter";
 import { portfolioData } from "./data/portfolioData";
-import { createCameraRig } from "./render/cameraRig";
-import { createRenderer, isWebGLAvailable } from "./render/createRenderer";
-import { createScene } from "./render/createScene";
+import { createCyberCoreScene } from "./render/cyberCoreScene";
+import { createShowcaseScenes } from "./render/showcaseScenes";
+import { createPortfolioInteractions } from "./ui/interactions";
 import { createPortfolioMarkup } from "./ui/sections";
 import "./styles/global.css";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
 if (!app) {
-  throw new Error("Unable to mount Aethergrid: #app was not found.");
+  throw new Error("Unable to mount portfolio: #app was not found.");
 }
 
 app.innerHTML = createPortfolioMarkup(portfolioData);
 
 const sceneHost = document.querySelector<HTMLElement>("#scene-host");
 const fallback = document.querySelector<HTMLElement>("#webgl-fallback");
-const typewriterRoot = document.querySelector<HTMLElement>(
-  "[data-typewriter-root]"
-);
-const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-let isReducedMotion = reduceMotionQuery.matches;
-let introProgress = reduceMotionQuery.matches ? 1 : 0;
-let experienceProgress = 0;
-let skillsProgress = 0;
-let scrollTimeline: ScrollTimelineHandle | undefined;
-let typewriter: TypewriterHandle | undefined;
-
-document.documentElement.dataset.motion = isReducedMotion
-  ? "reduced"
-  : "full";
-
-const updateMotionPreference = (event: MediaQueryListEvent) => {
-  isReducedMotion = event.matches;
-  document.documentElement.dataset.motion = isReducedMotion
-    ? "reduced"
-    : "full";
-
-  if (isReducedMotion) {
-    introProgress = 1;
-    document.documentElement.style.setProperty("--intro-progress", "1");
-    typewriter?.complete();
-  }
-
-  scrollTimeline?.destroy();
-  scrollTimeline = createPortfolioScrollTimeline();
-};
+const interactions = createPortfolioInteractions();
 
 const showFallback = () => {
   if (fallback) {
@@ -59,187 +25,45 @@ const showFallback = () => {
   if (sceneHost) {
     sceneHost.hidden = true;
   }
+
+  interactions.hideLoading();
 };
 
-const getScrollProgress = () => {
-  const scrollableHeight =
-    document.documentElement.scrollHeight - window.innerHeight;
+const supportsWebGL = () => {
+  try {
+    const canvas = document.createElement("canvas");
 
-  if (scrollableHeight <= 0) {
-    return 0;
+    return Boolean(
+      canvas.getContext("webgl2") || canvas.getContext("webgl")
+    );
+  } catch {
+    return false;
   }
-
-  return Math.min(Math.max(window.scrollY / scrollableHeight, 0), 1);
 };
 
-const startAetherScene = (host: HTMLElement) => {
-  const rendererHandle = createRenderer(host);
-  const aetherScene = createScene();
-  const cameraRig = createCameraRig();
-  const clock = new Clock();
-  const pointer = new Vector2(0, 0);
-  let frameId = 0;
-  let resizeFrameId = 0;
-  let isRunning = true;
+let disposeHeroScene: (() => void) | undefined;
+let disposeShowcaseScenes: (() => void) | undefined;
 
-  const resizeNow = () => {
-    rendererHandle.resize();
-    cameraRig.resize();
-  };
-
-  const scheduleResize = () => {
-    if (resizeFrameId !== 0) {
-      return;
-    }
-
-    resizeFrameId = window.requestAnimationFrame(() => {
-      resizeFrameId = 0;
-      resizeNow();
-    });
-  };
-
-  const updatePointer = (event: PointerEvent) => {
-    if (isReducedMotion) {
-      pointer.set(0, 0);
-
-      return;
-    }
-
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    pointer.y = -((event.clientY / window.innerHeight) * 2 - 1);
-  };
-
-  const tick = () => {
-    if (!isRunning) {
-      return;
-    }
-
-    const elapsed = isReducedMotion ? 0 : clock.getElapsedTime();
-    const scrollProgress = getScrollProgress();
-
-    aetherScene.update(
-      elapsed,
-      scrollProgress,
-      introProgress,
-      experienceProgress,
-      skillsProgress
-    );
-    cameraRig.update(
-      elapsed,
-      pointer,
-      scrollProgress,
-      introProgress,
-      experienceProgress,
-      skillsProgress
-    );
-    rendererHandle.renderer.render(aetherScene.scene, cameraRig.camera);
-    frameId = window.requestAnimationFrame(tick);
-  };
-
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === "visible") {
-      if (isRunning) {
-        return;
-      }
-
-      isRunning = true;
-      clock.start();
-      frameId = window.requestAnimationFrame(tick);
-
-      return;
-    }
-
-    isRunning = false;
-    window.cancelAnimationFrame(frameId);
-    frameId = 0;
-    clock.stop();
-  };
-
-  const handleContextLoss = (event: Event) => {
-    event.preventDefault();
-    showFallback();
-    isRunning = false;
-    window.cancelAnimationFrame(frameId);
-  };
-
-  window.addEventListener("resize", scheduleResize);
-  window.addEventListener("pointermove", updatePointer, { passive: true });
-  document.addEventListener("visibilitychange", handleVisibilityChange);
-  rendererHandle.canvas.addEventListener("webglcontextlost", handleContextLoss);
-
-  resizeNow();
-  tick();
-
-  return () => {
-    isRunning = false;
-    window.cancelAnimationFrame(frameId);
-    window.cancelAnimationFrame(resizeFrameId);
-    window.removeEventListener("resize", scheduleResize);
-    window.removeEventListener("pointermove", updatePointer);
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
-    rendererHandle.canvas.removeEventListener(
-      "webglcontextlost",
-      handleContextLoss
-    );
-    aetherScene.dispose();
-    rendererHandle.dispose();
-  };
-};
-
-function createPortfolioScrollTimeline() {
-  return createScrollTimeline({
-    reducedMotion: isReducedMotion,
-    onExperienceProgress: (progress) => {
-      experienceProgress = progress;
-    },
-    onSkillsProgress: (progress) => {
-      skillsProgress = progress;
-    }
-  });
-}
-
-if (!sceneHost || !isWebGLAvailable()) {
+if (!sceneHost || !supportsWebGL()) {
   showFallback();
 } else {
   try {
-    const disposeAetherScene = startAetherScene(sceneHost);
+    const heroScene = createCyberCoreScene(sceneHost, {
+      onReady: interactions.hideLoading
+    });
+    const showcaseScenes = createShowcaseScenes();
 
-    if (import.meta.hot) {
-      import.meta.hot.dispose(disposeAetherScene);
-    }
+    disposeHeroScene = heroScene.dispose;
+    disposeShowcaseScenes = showcaseScenes.destroy;
   } catch {
     showFallback();
   }
 }
 
-if (typewriterRoot) {
-  typewriter = createTypewriter({
-    root: typewriterRoot,
-    characterDelayMs: 17,
-    lineDelayMs: 130,
-    reducedMotion: isReducedMotion,
-    onProgress: (progress) => {
-      introProgress = progress;
-      document.documentElement.style.setProperty(
-        "--intro-progress",
-        progress.toFixed(3)
-      );
-    }
-  });
-
-  typewriter.start();
-
-  if (import.meta.hot) {
-    import.meta.hot.dispose(() => typewriter?.stop());
-  }
-}
-
-scrollTimeline = createPortfolioScrollTimeline();
-reduceMotionQuery.addEventListener("change", updateMotionPreference);
-
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
-    reduceMotionQuery.removeEventListener("change", updateMotionPreference);
-    scrollTimeline?.destroy();
+    disposeHeroScene?.();
+    disposeShowcaseScenes?.();
+    interactions.destroy();
   });
 }

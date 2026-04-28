@@ -13,155 +13,181 @@ const escapeHtml = (value: string) =>
     return entities[character];
   });
 
+const getSkillMeta = (skill: string, index: number) => {
+  const clean = skill.replace(/[^a-zA-Z0-9 ]/g, " ").trim();
+  const icon = clean
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+  const proficiency = Math.max(68, 96 - (index % 8) * 4);
+
+  return { icon: icon || "SK", proficiency };
+};
+
 const renderIntroLines = (lines: readonly string[]) =>
   lines
-    .map(
-      (line, index) =>
-        `<p data-typewriter-line data-typewriter-text="${escapeHtml(line)}" style="--line-index: ${index}">${escapeHtml(line)}</p>`
-    )
+    .map((line) => `<p>${escapeHtml(line)}</p>`)
+    .join("");
+
+const renderSkills = (skills: PortfolioData["skills"]) =>
+  skills
+    .map((skill, index) => {
+      const { icon, proficiency } = getSkillMeta(skill, index);
+
+      return `
+        <li class="skill-card" data-skill-card style="--delay: ${index * 120}ms; --proficiency: ${proficiency}%;">
+          <span class="skill-card__icon">${escapeHtml(icon)}</span>
+          <span class="skill-card__name">${escapeHtml(skill)}</span>
+          <span class="skill-card__meta">${proficiency}% sync</span>
+          <span class="skill-card__bar" aria-hidden="true"><span></span></span>
+        </li>
+      `;
+    })
     .join("");
 
 const renderExperienceEntries = (experiences: PortfolioData["experiences"]) =>
   experiences
     .map((experience, index) => {
-      const description = experience.description
-        .map(
-          (item) =>
-            `<li data-experience-bullet>${escapeHtml(item)}</li>`
-        )
+      const side = index % 2 === 0 ? "left" : "right";
+      const bullets = experience.description
+        .map((item) => `<li>${escapeHtml(item)}</li>`)
         .join("");
 
       return `
-        <article class="experience-entry" data-experience-entry data-entry-index="${index + 1}">
-          <div class="experience-entry__meta">
-            <span>${escapeHtml(experience.period)}</span>
-            <span>${String(index + 1).padStart(2, "0")}</span>
+        <article class="timeline-card timeline-card--${side}" data-experience-card>
+          <span class="timeline-card__dot" aria-hidden="true"></span>
+          <div class="timeline-card__inner">
+            <div class="timeline-card__meta">
+              <span>${escapeHtml(experience.period)}</span>
+              <span>${String(index + 1).padStart(2, "0")}</span>
+            </div>
+            <h3>${escapeHtml(experience.role)}</h3>
+            <p class="timeline-card__company">${escapeHtml(experience.company)}</p>
+            <ul>${bullets}</ul>
           </div>
-          <h3>${escapeHtml(experience.role)}</h3>
-          <p class="experience-entry__company">${escapeHtml(experience.company)}</p>
-          <ul>${description}</ul>
         </article>
       `;
     })
     .join("");
 
-const renderSkills = (skills: PortfolioData["skills"]) =>
-  skills
-    .map(
-      (skill, index) =>
-        `<li class="skill-chip" data-skill-chip data-skill-index="${index + 1}" style="--skill-index: ${index}; --skill-count: ${skills.length}"><span class="skill-chip__label">${escapeHtml(skill)}</span></li>`
-    )
-    .join("");
+const renderContactLinks = (data: PortfolioData["contact"]) => `
+  <a class="contact-link" href="mailto:${escapeHtml(data.email)}">
+    <span>email_</span>
+    <strong>${escapeHtml(data.email)}</strong>
+  </a>
+  <a class="contact-link" href="${escapeHtml(data.githubUrl)}" target="_blank" rel="noreferrer">
+    <span>github_</span>
+    <strong>GitHub</strong>
+  </a>
+  <a class="contact-link" href="${escapeHtml(data.linkedInUrl)}" target="_blank" rel="noreferrer">
+    <span>linkedin_</span>
+    <strong>LinkedIn</strong>
+  </a>
+`;
 
-const renderContactLinks = (
-  data: PortfolioData["contact"],
-  variant: "inline" | "final"
-) => {
-  const finalAttribute = variant === "final" ? " data-final-contact-link" : "";
-  const links = [
-    {
-      className: "contact-link--email",
-      href: `mailto:${data.email}`,
-      label: data.email,
-      meta: "Email",
-      target: ""
-    },
-    {
-      className: "contact-link--github",
-      href: data.githubUrl,
-      label: "GitHub",
-      meta: "Code",
-      target: ' target="_blank" rel="noreferrer"'
-    },
-    {
-      className: "contact-link--linkedin",
-      href: data.linkedInUrl,
-      label: "LinkedIn",
-      meta: "Network",
-      target: ' target="_blank" rel="noreferrer"'
-    }
-  ];
-
-  return links
-    .map(
-      (link) =>
-        `<a class="contact-link ${link.className}" href="${escapeHtml(link.href)}"${link.target} data-contact-link${finalAttribute}>
-          <span>${escapeHtml(link.meta)}</span>
-          <strong>${escapeHtml(link.label)}</strong>
-        </a>`
-    )
-    .join("");
-};
-
-export const createPortfolioMarkup = (data: PortfolioData) => {
-  const introLines = renderIntroLines(data.intro);
-  const inlineContactLinks = renderContactLinks(data.contact, "inline");
-  const finalContactLinks = renderContactLinks(data.contact, "final");
-
-  return `
-    <a class="skip-link" href="#content">Skip to content</a>
-    <div id="scene-host" class="scene-host" aria-hidden="true"></div>
-    <p id="webgl-fallback" class="webgl-fallback" role="status" hidden>
-      WebGL scene unavailable. Portfolio content remains available below.
-    </p>
-    <main id="content" class="portfolio-shell" tabindex="-1">
-      <section class="hero-section page-section" aria-labelledby="intro-title">
-        <div class="hero-orbital" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <p class="eyebrow hero-eyebrow">Aethergrid identity uplink</p>
+export const createPortfolioMarkup = (data: PortfolioData) => `
+  <div class="loading-screen" data-loading-screen>
+    <svg class="loading-screen__core" viewBox="0 0 120 120" aria-hidden="true">
+      <path d="M60 8 104 36 90 96 30 96 16 36Z" />
+      <path d="M60 8 60 112M16 36 90 96M104 36 30 96M16 36 104 36M30 96 90 96" />
+      <path d="M60 28 82 44 74 76 46 76 38 44Z" />
+    </svg>
+    <span>initialising_</span>
+  </div>
+  <div class="cursor-dot" data-cursor-dot></div>
+  <div class="cursor-ring" data-cursor-ring></div>
+  <div class="reading-progress" aria-hidden="true">
+    <span data-reading-progress></span>
+  </div>
+  <a class="skip-link" href="#content">skip_to_content_</a>
+  <div id="scene-host" class="scene-host" aria-hidden="true"></div>
+  <p id="webgl-fallback" class="webgl-fallback" role="status" hidden>
+    WebGL scene unavailable. Portfolio content remains available below.
+  </p>
+  <main id="content" class="portfolio-shell" tabindex="-1">
+    <section class="hero-section" aria-labelledby="intro-title">
+      <div class="hero-copy">
+        <p class="eyebrow">cyber_core_</p>
         <h1 id="intro-title">${escapeHtml(data.name)}</h1>
-        <p class="title">${escapeHtml(data.title)}</p>
-        <div class="intro-panel">
-          <span class="intro-panel__label">initializing profile stream</span>
-          <div class="intro-lines" data-typewriter-root>${introLines}</div>
+        <p class="hero-title">${escapeHtml(data.title)}</p>
+        <div class="hero-intro">${renderIntroLines(data.intro)}</div>
+        <div class="hero-actions">
+          <a href="#work">view_webgl_work_</a>
+          <a href="#contact">contact_signal_</a>
         </div>
-        <nav class="contact-links contact-links--inline" aria-label="Primary contact links">
-          ${inlineContactLinks}
-        </nav>
-      </section>
+      </div>
+      <div class="hero-status" aria-hidden="true">
+        <span>orbit controls enabled</span>
+        <span>drag to rotate core</span>
+        <span>4000 particle field</span>
+      </div>
+    </section>
 
-      <section class="experience-section page-section" aria-labelledby="experience-title" data-experience-section>
-        <div class="section-heading" data-experience-heading>
-          <p class="eyebrow">Experience signal</p>
-          <h2 id="experience-title">${escapeHtml(data.experienceSummary.totalYears)}</h2>
-          <p>${escapeHtml(data.experienceSummary.headline)}</p>
-        </div>
-        <div class="experience-list">
-          ${renderExperienceEntries(data.experiences)}
-        </div>
-      </section>
+    <section class="content-section skills-section" id="skills" aria-labelledby="skills-title">
+      <div class="section-heading" data-section-heading>
+        <p class="eyebrow">capability grid_</p>
+        <h2 id="skills-title">skills_</h2>
+      </div>
+      <ul class="skills-grid" aria-label="Skills">
+        ${renderSkills(data.skills)}
+      </ul>
+    </section>
 
-      <section class="skills-section page-section" aria-labelledby="skills-title" data-skills-section>
-        <div class="section-heading" data-skills-heading>
-          <p class="eyebrow">Skill matrix</p>
-          <h2 id="skills-title">Core Capabilities</h2>
-        </div>
-        <div class="skills-stage" data-skills-stage>
-          <span class="skills-stage__ring" aria-hidden="true"></span>
-          <span class="skills-stage__core" aria-hidden="true"></span>
-          <ul class="skill-grid" aria-label="Skills">
-            ${renderSkills(data.skills)}
-          </ul>
-        </div>
-      </section>
+    <section class="content-section experience-section" id="experience" aria-labelledby="experience-title" data-experience-section>
+      <div class="section-heading" data-section-heading>
+        <p class="eyebrow">${escapeHtml(data.experienceSummary.totalYears)}</p>
+        <h2 id="experience-title">experience_</h2>
+        <p>${escapeHtml(data.experienceSummary.headline)}</p>
+      </div>
+      <div class="timeline">
+        <span class="timeline__line" aria-hidden="true">
+          <span data-timeline-fill></span>
+        </span>
+        ${renderExperienceEntries(data.experiences)}
+      </div>
+    </section>
 
-      <section class="contact-section page-section" aria-labelledby="contact-title" data-contact-section>
-        <div class="section-heading" data-contact-heading>
-          <p class="eyebrow">Open channel</p>
-          <h2 id="contact-title">Reach Out</h2>
-          <p>Use any active signal below to connect.</p>
-        </div>
-        <div class="contact-stage" data-contact-stage>
-          <span class="contact-stage__beam" aria-hidden="true"></span>
-          <span class="contact-stage__node" aria-hidden="true"></span>
-          <nav class="contact-links contact-links--final" aria-label="Final contact links">
-            ${finalContactLinks}
-          </nav>
-        </div>
-      </section>
-    </main>
-  `;
-};
+    <section class="content-section showcase-section" id="work" aria-labelledby="work-title">
+      <div class="section-heading" data-section-heading>
+        <p class="eyebrow">three.js proof_</p>
+        <h2 id="work-title">work_</h2>
+        <p>Three compact WebGL studies running independently from the hero scene.</p>
+      </div>
+      <div class="showcase-grid">
+        <article class="showcase-card">
+          <div class="showcase-card__canvas">
+            <canvas data-showcase-canvas="particle-morph" aria-label="Particle morph WebGL canvas"></canvas>
+          </div>
+          <h3>particle morph_</h3>
+          <p>3000 points shift between sphere and torus fields.</p>
+        </article>
+        <article class="showcase-card">
+          <div class="showcase-card__canvas">
+            <canvas data-showcase-canvas="shader-wave" aria-label="Shader wave WebGL canvas"></canvas>
+          </div>
+          <h3>shader wave_</h3>
+          <p>Vertex displacement and height-color fragment shading.</p>
+        </article>
+        <article class="showcase-card showcase-card--glitch">
+          <div class="showcase-card__canvas">
+            <canvas data-showcase-canvas="glitch-cube" aria-label="Glitch cube WebGL canvas"></canvas>
+          </div>
+          <h3>glitch cube_</h3>
+          <p>Edges, vertex jitter, and chromatic CSS hue cycling.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="content-section contact-section" id="contact" aria-labelledby="contact-title">
+      <div class="section-heading" data-section-heading>
+        <p class="eyebrow">open channel_</p>
+        <h2 id="contact-title">contact_</h2>
+      </div>
+      <nav class="contact-links" aria-label="Contact links">
+        ${renderContactLinks(data.contact)}
+      </nav>
+    </section>
+  </main>
+`;

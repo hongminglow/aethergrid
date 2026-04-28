@@ -1,6 +1,6 @@
 # Aethergrid
 
-Aethergrid is a cinematic developer identity experience built around a futuristic cyberpunk fantasy visual direction. It uses a full-screen Three.js scene, scroll-triggered storytelling, animated introduction text, staggered job experience reveals, animated skills, and a final contact section for email, GitHub, and LinkedIn.
+Aethergrid is a dark cyberpunk developer identity experience built around Three.js as the primary visual engine. It uses an interactive full-viewport Cyber Core, a live particle field, floating node network, scroll-aware skill and experience sections, three independent WebGL showcase canvases, and a final contact section for email, GitHub, and LinkedIn.
 
 The experience is designed so the owner can update the main content from one data file instead of editing rendering or animation code.
 
@@ -15,14 +15,15 @@ The site presents:
 - Skills, designed to support 10 to 20+ items.
 - Contact links for email, GitHub, and LinkedIn.
 
-The goal is not a generic resume grid. The experience should feel like entering a neon fantasy-tech environment where the visitor scrolls through identity, experience, skills, and contact details.
+The goal is not a generic resume grid. The experience should feel like entering a neon technical environment where the 3D work is part of the product, not a decorative background.
 
 ## Tech Stack
 
 - Vite
 - TypeScript
 - Three.js
-- GSAP ScrollTrigger or equivalent scroll animation system
+- OrbitControls
+- IntersectionObserver and requestAnimationFrame-driven UI effects
 - HTML/CSS DOM overlays for readable content
 
 ## Architecture
@@ -33,17 +34,11 @@ src/
   data/
     portfolioData.ts
   render/
-    createRenderer.ts
-    createScene.ts
-    cameraRig.ts
-    effects.ts
-    particles.ts
-  animation/
-    scrollTimeline.ts
-    typewriter.ts
+    cyberCoreScene.ts
+    showcaseScenes.ts
   ui/
     sections.ts
-    domBindings.ts
+    interactions.ts
   styles/
     global.css
 ```
@@ -101,4 +96,4 @@ npm run preview
 
 ## Current Status
 
-Final delivery is complete. The repository contains the Vite + TypeScript scaffold, editable portfolio data file, data-driven DOM sections, Three.js cyberpunk fantasy visual foundation, cinematic opening identity scene with typewriter intro reveal, scroll-triggered experience sequence, scroll-triggered skill matrix, animated reach-out terminal, responsive layout hardening, keyboard-accessible contact flow, `prefers-reduced-motion` handling, performance hardening, and final QA coverage.
+Patch-notes redraft is complete. The current version contains an interactive Three.js Cyber Core hero, 4000-particle field, floating node network, loading screen, custom cursor, scroll-revealed skill cards with proficiency bars, center-line work experience timeline, three mini Three.js showcase canvases, responsive layout hardening, and build verification.

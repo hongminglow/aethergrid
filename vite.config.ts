@@ -2,15 +2,12 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   build: {
+    chunkSizeWarningLimit: 550,
     rolldownOptions: {
       output: {
         manualChunks: (id) => {
           if (id.includes("node_modules/three")) {
             return "three-vendor";
-          }
-
-          if (id.includes("node_modules/gsap")) {
-            return "motion-vendor";
           }
         }
       }
