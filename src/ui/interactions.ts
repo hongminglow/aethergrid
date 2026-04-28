@@ -363,6 +363,7 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
       onUpdate: (self) => renderTypewriterProgress(self.progress),
       pin: true,
       pinType: "fixed",
+      refreshPriority: 10,
       start: "top top",
       trigger: typewriterSection
     });
@@ -384,13 +385,11 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
     const sequenceDuration = skillCards.length * 0.22 + 1.55;
     const timeline = gsap.timeline({
       defaults: { ease: "expo.out" },
-      scrollTrigger: {
-        end: "center 58%",
-        invalidateOnRefresh: true,
-        scrub: 0.9,
-        start: "top 96%",
-        trigger: skillsGrid
-      }
+      paused: true
+    });
+
+    gsap.set(skillsSection, {
+      "--skills-scan": 0
     });
 
     timeline.to(
@@ -417,6 +416,7 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
         card.style.getPropertyValue("--proficiency").trim() || "84%";
 
       card.classList.add("is-scrolltrigger-card");
+      card.classList.remove("is-visible");
       gsap.set(card, {
         "--skill-grid": 0,
         autoAlpha: 0,
@@ -449,8 +449,6 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
             clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
             duration: 1.44,
             filter: "blur(0px) brightness(1) saturate(1.08)",
-            onComplete: () => card.classList.add("is-visible"),
-            onReverseComplete: () => card.classList.remove("is-visible"),
             rotation: 0,
             rotationX: 0,
             rotationY: 0,
@@ -525,11 +523,43 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
         );
     });
 
+    let skillsFrame = 0;
+    const getSkillsTravel = () =>
+      Math.max(window.innerHeight * 0.92, skillCards.length * 60);
+    const updateSkillsTimeline = () => {
+      skillsFrame = 0;
+
+      const sectionTop = skillsSection.getBoundingClientRect().top;
+      const triggerLine = window.innerHeight * 1.09;
+      const progress = clamp01((triggerLine - sectionTop) / getSkillsTravel());
+
+      timeline.progress(progress);
+    };
+    const scheduleSkillsUpdate = () => {
+      if (skillsFrame !== 0) {
+        return;
+      }
+
+      skillsFrame = window.requestAnimationFrame(updateSkillsTimeline);
+    };
+
+    window.addEventListener("scroll", scheduleSkillsUpdate, { passive: true });
+    window.addEventListener("resize", scheduleSkillsUpdate);
+
     cleanup.push(() => {
-      timeline.scrollTrigger?.kill();
+      window.removeEventListener("scroll", scheduleSkillsUpdate);
+      window.removeEventListener("resize", scheduleSkillsUpdate);
+      window.cancelAnimationFrame(skillsFrame);
       timeline.kill();
     });
-    window.requestAnimationFrame(() => ScrollTrigger.refresh());
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        ScrollTrigger.sort();
+        ScrollTrigger.refresh();
+        updateSkillsTimeline();
+        updateScrollState();
+      });
+    });
   }
 
   const revealObserver = new IntersectionObserver(
