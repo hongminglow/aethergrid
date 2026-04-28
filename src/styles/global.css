@@ -245,6 +245,17 @@ body.is-cursor-clicking .cursor-dot {
   scale: 2.5;
 }
 
+body.is-scene-dragging {
+  user-select: none;
+}
+
+body.is-scene-dragging .cursor-ring {
+  width: 58px;
+  height: 58px;
+  background: rgb(255 0 170 / 12%);
+  border-color: var(--magenta);
+}
+
 .hero-section {
   min-height: calc(100vh - 64px);
   display: grid;

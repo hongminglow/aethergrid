@@ -193,7 +193,7 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
           {
             autoAlpha: 1,
             clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-            duration: 1.18,
+            duration: 1.44,
             filter: "blur(0px) brightness(1) saturate(1.08)",
             onComplete: () => card.classList.add("is-visible"),
             onReverseComplete: () => card.classList.remove("is-visible"),
@@ -224,7 +224,7 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
           {
             "--skill-sweep": 1,
             "--skill-sweep-x": "136%",
-            duration: 0.62,
+            duration: 0.82,
             ease: "power2.inOut"
           },
           startAt + 0.2
@@ -233,7 +233,7 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
           content,
           {
             autoAlpha: 1,
-            duration: 0.44,
+            duration: 0.58,
             ease: "power3.out",
             stagger: 0.07,
             y: 0
@@ -263,7 +263,7 @@ export const createPortfolioInteractions = (): PortfolioInteractions => {
         .to(
           bar,
           {
-            duration: 0.72,
+            duration: 0.92,
             ease: "power2.out",
             width: proficiency
           },
