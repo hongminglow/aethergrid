@@ -9,6 +9,7 @@ export default defineConfig({
           if (id.includes("node_modules/three")) {
             return "three-vendor";
           }
+          return null;
         }
       }
     }
