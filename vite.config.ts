@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     chunkSizeWarningLimit: 550,
-    rolldownOptions: {
+    rollupOptions: {
       output: {
         manualChunks: (id) => {
           if (id.includes("node_modules/three")) {
